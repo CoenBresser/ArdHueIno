@@ -32,27 +32,7 @@ int led = 13;           // the pin that the LED is attached to
 int brightness = 0;    // how bright the LED is
 int fadeAmount = 5;    // how many points to fade the LED by
 
-void setup() {
-    pinMode(led, OUTPUT);
-    
-    // Initialize Bridge
-    Bridge.begin();
-    
-    // Initialize Serial
-    Serial.begin(9600);
-    
-    // Wait until a Serial Monitor is connected.
-    while (!Serial) {
-        fadeForMillis(1000, 3);
-    }
-    
-    // Do the hue setup
-    setupHue();
-}
-
-void loop() {
-    fadeForMillis(5000, error ? 20 : 5);
-}
+/***** Private methods section *****/
 
 void fadeForMillis(unsigned int totalTime, int delayTime) {
     for (int i = 0; i <= totalTime / delayTime; i++) {
@@ -80,60 +60,6 @@ struct Config {
     char userName[33];
 };
 Config config = { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" };
-
-/*
- int ticker = 0;
- void tick(String here) {
- Serial.print("ticked: ");
- Serial.print(ticker++);
- Serial.print(", from: ");
- Serial.println(here);
- Serial.print("Current error code: ");
- Serial.println(error);
- }*/
-
-void setupHue() {
-    char* hueRL = NULL;
-    while (hueRL == NULL) {
-        hueRL = getHueRL();
-        if (hueRL == NULL) {
-            fadeForMillis(6000, 10);
-        }
-    }
-    
-    Serial.print("Using Hue on: ");
-    Serial.println(hueRL);
-    
-    char* hueser = getUser(hueRL);
-    Serial.print("Using username: ");
-    Serial.println(hueser);
-    Serial.flush();
-    if (hueser == NULL) {
-        return;
-    }
-    
-    // We have a valid Hue configuration now
-    
-    // Enable alert on the light called "Color Light"
-    
-    /*
-     Process p;
-     char url[lightsUrlLen(hueRL, hueser)];
-     buildLightsUrl(hueRL, hueser, url);
-     doGetRequestMacro(p, url,);
-     
-     while (p.available() > 0) {
-     char c = p.read();
-     Serial.print(c);
-     }
-     /*
-     // Check if we have a user and if not, create it
-     if (!checkCreateUser(hueRL)) {
-     return;
-     }
-     */
-    Serial.flush();
-}
 
 char* getHueRL() {
     static char hueRL[40];
@@ -164,60 +90,39 @@ char* getHueRL() {
     return hueRL;
 }
 
-char* getUser(char* hueRL) {
-    // 16 byte hex / 32 nibble hex, just take it as a string
-    // the 33'rd char holds 0 for the string terminator
-    // char userName[33] = "27787d893751a7726400ccd3c6db19b";
-    
-    // Get the user from the EEPROM
-    EEPROM.get(configAddress, config);
-    
-    // Check if we have a valid user by probing the first character and testing it on the Hue
-    if (config.userName[0] > 0) {
-        
-        int resp = getLightsConfig(hueRL, config.userName);
-        
-        // Everything else means there is a problem and we need a new user
-        if (resp == 0) {
-            return config.userName;
+int lightsUrlLen(char* apiBase, char* userName) {
+    return strlen(apiBase) + strlen(userName) + strlen("/lights/");
+}
+
+int buildLightsUrl(char* apiBase, char* userName, char* dest) {
+    strcpy(dest, apiBase);
+    strcat(dest, userName);
+    strcat(dest, "/lights/");
+    return strlen(dest);
+}
+
+int parseError(Process p) {
+    Serial.println("Parsing error");
+    // Set the error to a generic error
+    int returnCode = 1;
+    while (p.available() > 0) {
+        String subpart = p.readStringUntil('"');
+        if (subpart == "type") {
+            returnCode = p.parseInt();
+            Serial.print("Error code: ");
+            Serial.println(returnCode);
+        }
+        if (subpart == "description") {
+            // Skip the colon - ": "
+            p.readStringUntil('"');
+            Serial.println(p.readStringUntil('"'));
         }
     }
-    
-    Serial.println("No (valid) user, setting up a new one");
     Serial.flush();
-    
-    // This method blocks until we have a user or an insolvable error
-    if (doNewUserRegistration(hueRL, config.userName) > 0) {
-        return NULL;
-    }
-    
-    Serial.print("Received user: ");
-    Serial.println(config.userName);
-    Serial.flush();
-    
-    EEPROM.put(configAddress, config);
-    
-    // Get the lights configuration. If it fails there's nothing to do anymore
-    if (getLightsConfig(hueRL, config.userName) != 0) {
-        return NULL;
-    }
-    
-    // All set
-    return config.userName;
+    p.flush();
+    p.close();
+    return returnCode;
 }
-
-/**
- * Get the lights configuration
- */
-int getLightsConfig(char* hueRL, char* userName) {
-    char url[lightsUrlLen(hueRL, userName)];
-    buildLightsUrl(hueRL, userName, url);
-    
-    Process p;
-    doGetRequestMacro(p, url, );
-    return checkLightsResponse(p);
-}
-
 
 int checkLightsResponse(Process p) {
     int level = 0;
@@ -273,38 +178,56 @@ int checkLightsResponse(Process p) {
     return 0;
 }
 
-int parseError(Process p) {
-    Serial.println("Parsing error");
-    // Set the error to a generic error
-    int returnCode = 1;
+/**
+ * Get the lights configuration
+ */
+int getLightsConfig(char* hueRL, char* userName) {
+    char url[lightsUrlLen(hueRL, userName)];
+    buildLightsUrl(hueRL, userName, url);
+    
+    Process p;
+    doGetRequestMacro(p, url, );
+    return checkLightsResponse(p);
+}
+
+int checkUserCreateResponse(Process p, char* userNameDest) {
+    // Examples:
+    //[{"success":{"username":"27787d893751a7726400ccd3c6db19b"}}]
+    //[{"error":{"type":101,"address":"/","description":"link button not pressed"}}]
+    
+    int returnCode = 0;
+    bool isValid = true;
     while (p.available() > 0) {
         String subpart = p.readStringUntil('"');
-        if (subpart == "type") {
+        if (subpart == "error") {
+            isValid = false;
+        }
+        if (!isValid && subpart == "type") {
             returnCode = p.parseInt();
             Serial.print("Error code: ");
             Serial.println(returnCode);
         }
-        if (subpart == "description") {
+        if (!isValid && subpart == "description") {
             // Skip the colon - ": "
             p.readStringUntil('"');
             Serial.println(p.readStringUntil('"'));
+        }
+        if (subpart == "success") {
+            isValid = true;
+        }
+        if (subpart == "username") {
+            // Skip the colon - ": "
+            p.readStringUntil('"');
+            int nrBytesRead = p.readBytesUntil('"', userNameDest, 32);
+            userNameDest[nrBytesRead] = 0; // terminate the string
+            Serial.print("New userName: ");
+            Serial.println(userNameDest);
         }
     }
     Serial.flush();
     p.flush();
     p.close();
     return returnCode;
-}
-
-int lightsUrlLen(char* apiBase, char* userName) {
-    return strlen(apiBase) + strlen(userName) + strlen("/lights/");
-}
-
-int buildLightsUrl(char* apiBase, char* userName, char* dest) {
-    strcpy(dest, apiBase);
-    strcat(dest, userName);
-    strcat(dest, "/lights/");
-    return strlen(dest);
 }
 
 /**
@@ -346,42 +269,95 @@ int doNewUserRegistration(char* hueRL, char* userNameDest) {
     return 1;
 }
 
-int checkUserCreateResponse(Process p, char* userNameDest) {
-    // Examples:
-    //[{"success":{"username":"27787d893751a7726400ccd3c6db19b"}}]
-    //[{"error":{"type":101,"address":"/","description":"link button not pressed"}}]
+char* getUser(char* hueRL) {
+    // 16 byte hex / 32 nibble hex, just take it as a string
+    // the 33'rd char holds 0 for the string terminator
+    // char userName[33] = "27787d893751a7726400ccd3c6db19b";
     
-    int returnCode = 0;
-    bool isValid = true;
-    while (p.available() > 0) {
-        String subpart = p.readStringUntil('"');
-        if (subpart == "error") {
-            isValid = false;
-        }
-        if (!isValid && subpart == "type") {
-            returnCode = p.parseInt();
-            Serial.print("Error code: ");
-            Serial.println(returnCode);
-        }
-        if (!isValid && subpart == "description") {
-            // Skip the colon - ": "
-            p.readStringUntil('"');
-            Serial.println(p.readStringUntil('"'));
-        }
-        if (subpart == "success") {
-            isValid = true;
-        }
-        if (subpart == "username") {
-            // Skip the colon - ": "
-            p.readStringUntil('"');
-            int nrBytesRead = p.readBytesUntil('"', userNameDest, 32);
-            userNameDest[nrBytesRead] = 0; // terminate the string
-            Serial.print("New userName: ");
-            Serial.println(userNameDest);
+    // Get the user from the EEPROM
+    EEPROM.get(configAddress, config);
+    
+    // Check if we have a valid user by probing the first character and testing it on the Hue
+    if (config.userName[0] > 0) {
+        
+        int resp = getLightsConfig(hueRL, config.userName);
+        
+        // Everything else means there is a problem and we need a new user
+        if (resp == 0) {
+            return config.userName;
         }
     }
+    
+    Serial.println("No (valid) user, setting up a new one");
     Serial.flush();
-    p.flush();
-    p.close();
-    return returnCode;
+    
+    // This method blocks until we have a user or an insolvable error
+    if (doNewUserRegistration(hueRL, config.userName) > 0) {
+        return NULL;
+    }
+    
+    Serial.print("Received user: ");
+    Serial.println(config.userName);
+    Serial.flush();
+    
+    EEPROM.put(configAddress, config);
+    
+    // Get the lights configuration. If it fails there's nothing to do anymore
+    if (getLightsConfig(hueRL, config.userName) != 0) {
+        return NULL;
+    }
+    
+    // All set
+    return config.userName;
+}
+
+void setupHue() {
+    char* hueRL = NULL;
+    while (hueRL == NULL) {
+        hueRL = getHueRL();
+        if (hueRL == NULL) {
+            fadeForMillis(6000, 10);
+        }
+    }
+    
+    Serial.print("Using Hue on: ");
+    Serial.println(hueRL);
+    
+    char* hueser = getUser(hueRL);
+    Serial.print("Using username: ");
+    Serial.println(hueser);
+    Serial.flush();
+    if (hueser == NULL) {
+        return;
+    }
+    
+    // We have a valid Hue configuration now
+    
+    // Enable alert on the light called "Color Light"
+    
+    Serial.flush();
+}
+
+/***** Public methods section *****/
+
+void setup() {
+    pinMode(led, OUTPUT);
+    
+    // Initialize Bridge
+    Bridge.begin();
+    
+    // Initialize Serial
+    Serial.begin(9600);
+    
+    // Wait until a Serial Monitor is connected.
+    while (!Serial) {
+        fadeForMillis(1000, 3);
+    }
+    
+    // Do the hue setup
+    setupHue();
+}
+
+void loop() {
+    fadeForMillis(5000, error ? 20 : 5);
 }
