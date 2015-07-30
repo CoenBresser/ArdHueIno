@@ -11,21 +11,6 @@
 
 #include <EEPROM.h>
 
-/* Define this in a macro as Process cannot be passed as a function nor referenced outside a scope */
-#define doGetRequestMacro(pForMacro, urlForMacro, retFunc)  \
-pForMacro.begin("curl");                                  \
-pForMacro.addParameter("-L");                             \
-pForMacro.addParameter("-k");                             \
-pForMacro.addParameter(urlForMacro);                      \
-if (error = pForMacro.run()) {                            \
-Serial.print("CURL error: ");                           \
-Serial.println(error);                                  \
-Serial.flush();                                         \
-pForMacro.flush();                                      \
-pForMacro.close();                                      \
-retFunc                                                 \
-}
-
 int error = 0;        // global error codes to enable visual feedback
 
 int led = 13;           // the pin that the LED is attached to
@@ -33,6 +18,22 @@ int brightness = 0;    // how bright the LED is
 int fadeAmount = 5;    // how many points to fade the LED by
 
 /***** Private methods section *****/
+
+int doGetRequest(Process p, char* url) {
+    p.begin("curl");
+    p.addParameter("-L");
+    p.addParameter("-k");
+    p.addParameter(url);
+    if (error = p.run()) {
+        Serial.print("CURL error: ");
+        Serial.println(error);
+        Serial.flush();
+        p.flush();
+        p.close();
+        return false;
+    }
+    return error;
+}
 
 void fadeForMillis(unsigned int totalTime, int delayTime) {
     for (int i = 0; i <= totalTime / delayTime; i++) {
@@ -65,7 +66,9 @@ char* getHueRL() {
     static char hueRL[40];
     
     Process p;
-    doGetRequestMacro(p, "http://www.meethue.com/api/nupnp", return NULL;);
+    if (doGetRequest(p, "http://www.meethue.com/api/nupnp") > 0) {
+        return NULL;
+    }
     
     // Search for the 7th " in the string (e.g. [{"id":"001234556","internalipaddress":"192.168.2.2"}])
     // Ignore errors, this will be caught when trying to resolve
@@ -186,7 +189,7 @@ int getLightsConfig(char* hueRL, char* userName) {
     buildLightsUrl(hueRL, userName, url);
     
     Process p;
-    doGetRequestMacro(p, url, );
+    doGetRequest(p, url);
     return checkLightsResponse(p);
 }
 
