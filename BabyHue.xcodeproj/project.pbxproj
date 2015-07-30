@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2025D62A1B5D9503001AFE23 /* LocalLibrary.h in Sources */ = {isa = PBXBuildFile; fileRef = 2035D62A1B5D9503001AFE23 /* LocalLibrary.h */; };
 		2025D6A01B5D9503001AFE23 /* BabyHue.ino in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6A01B5D9503001AFE23 /* BabyHue.ino */; };
+		2026E0DB1B6A4F7A005B6C61 /* HueWebCalls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */; };
 		2035D6241B5D9503001AFE23 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6231B5D9503001AFE23 /* main.cpp */; };
 		2035D6291B5D9503001AFE23 /* LocalLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6281B5D9503001AFE23 /* LocalLibrary.cpp */; };
 		AA2A150730090325AA000006 /* abi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000006 /* abi.cpp */; };
@@ -75,7 +76,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2026E0D61B6A4415005B6C61 /* WebCalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCalls.h; sourceTree = "<group>"; };
+		2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HueWebCalls.cpp; sourceTree = "<group>"; };
+		2026E0DA1B6A4F7A005B6C61 /* HueWebCalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HueWebCalls.h; sourceTree = "<group>"; };
 		2035D6201B5D9503001AFE23 /* Index */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Index; sourceTree = BUILT_PRODUCTS_DIR; };
 		2035D6231B5D9503001AFE23 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		2035D6251B5D9503001AFE23 /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -290,7 +292,8 @@
 				2035D6781B5D9503001AFE23 /* Makefiles */,
 				2035D6961B5D9503001AFE23 /* About */,
 				2035D6981B5D9503001AFE23 /* Utilities */,
-				2026E0D61B6A4415005B6C61 /* WebCalls.h */,
+				2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */,
+				2026E0DA1B6A4F7A005B6C61 /* HueWebCalls.h */,
 			);
 			path = BabyHue;
 			sourceTree = "<group>";
@@ -887,6 +890,7 @@
 				AA2A150730090325AA00003C /* twi.h in Sources */,
 				AA2A150730090325AA00003D /* Wire.cpp in Sources */,
 				AA2A150730090325AA00003E /* Wire.h in Sources */,
+				2026E0DB1B6A4F7A005B6C61 /* HueWebCalls.cpp in Sources */,
 				AA2A150730090325AA000041 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000043 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000045 /* pins_arduino.h in Sources */,

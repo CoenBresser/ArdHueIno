@@ -11,6 +11,8 @@
 
 #include <EEPROM.h>
 
+#include "HueWebCalls.h"
+
 int error = 0;        // global error codes to enable visual feedback
 
 int led = 13;           // the pin that the LED is attached to
@@ -19,64 +21,9 @@ int fadeAmount = 5;    // how many points to fade the LED by
 
 // For some reason passing this as a parameter results in not being able to read the stream...
 Process p;
+HueWebCalls w;
 
 /***** Private methods section *****/
-
-int doGetRequest(String url) {
-    Serial.println("Execute GET on: " + url);
-    p.begin("curl");
-    p.addParameter("-L");
-    p.addParameter("-k");
-    p.addParameter(url);
-    if (error = p.run()) {
-        Serial.print("CURL error: ");
-        Serial.println(error);
-        Serial.flush();
-        p.flush();
-        p.close();
-    }
-    return error;
-}
-
-int doPostRequest(String url, String data) {
-    Serial.println("Execute POST on: " + url + ", with data: " + data);
-    p.begin("curl");
-    p.addParameter("-H");
-    p.addParameter("\"Content-Type: application/json\"");
-    p.addParameter("-X");
-    p.addParameter("POST");
-    p.addParameter("-d");
-    p.addParameter(data);
-    p.addParameter(url);
-    if (error = p.run()) {
-        Serial.print("CURL error: ");
-        Serial.println(error);
-        Serial.flush();
-        p.flush();
-        p.close();
-    }
-    return error;
-}
-
-int doPutRequest(String url, String data) {
-    Serial.println("Execute PUT on: " + url + ", with data: " + data);
-    p.begin("curl");
-    p.addParameter("-H");
-    p.addParameter("\"Content-Type: application/json\"");
-    p.addParameter("-X");
-    p.addParameter("PUT");
-    p.addParameter("-d");
-    p.addParameter(data);
-    p.addParameter(url);
-    if (error = p.run()) {
-        Serial.print("CURL error: ");
-        Serial.println(error);
-        Serial.flush();
-        p.flush();
-        p.close();
-    }
-    return error;
-}
 
 void fadeForMillis(unsigned int totalTime, int delayTime) {
     for (int i = 0; i <= totalTime / delayTime; i++) {
@@ -105,34 +52,7 @@ struct Config {
 };
 Config config = { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" };
 
-String getHueRL() {
-    Serial.println("getHueRL");
-    
-    if (false) {
-        
-        if (doGetRequest("http://www.meethue.com/api/nupnp") > 0) {
-            Serial.println("error");
-            return "";
-        }
-        
-        while (p.available()) {
-            char c = p.read();
-            Serial.print(c);
-        }
-        p.flush();
-        p.close();
-        Serial.flush();
-    
-        return "";
-    }
-    
-    if (doGetRequest("http://www.meethue.com/api/nupnp") > 0) {
-        return "";
-    }
-    
-    Serial.println("Parse hue locator answer");
-    Serial.flush();
-    
+String parseHueLocationAnswer(Process p) {
     // Search for the 7th " in the string (e.g. [{"id":"001234556","internalipaddress":"192.168.2.2"}])
     // Ignore errors, this will be caught when trying to resolve
     for (int i = 0; i < 7; i++) {
@@ -140,14 +60,21 @@ String getHueRL() {
     }
     
     // Get the address
-    String hueRL = "http://" + p.readStringUntil('"') + "/api/";
-    p.flush();
-    p.close();
-    
+    return "http://" + p.readStringUntil('"') + "/api/";
+}
+
+String getHueRL() {
+    String hueRL = w.doGet("http://www.meethue.com/api/nupnp", [] (Process p) -> String {
+        // Search for the 7th " in the string (e.g. [{"id":"001234556","internalipaddress":"192.168.2.2"}])
+        // Ignore errors, this will be caught when trying to resolve
+        for (int i = 0; i < 7; i++) {
+            String dump = p.readStringUntil('"');
+        }
+        
+        // Get the address
+        return "http://" + p.readStringUntil('"') + "/api/";
+    });
     Bridge.put("HueRL", hueRL);
-    
-    Serial.println(hueRL);
-    Serial.flush();
     return hueRL;
 }
 
@@ -171,7 +98,6 @@ String buildAlertUrl(String apiBase, String userName, String id) {
 }
 
 int parseError(Process p) {
-    Serial.println("Parsing error");
     // Set the error to a generic error
     int returnCode = 1;
     while (p.available() > 0) {
@@ -193,7 +119,7 @@ int parseError(Process p) {
     return returnCode;
 }
 
-int checkLightsResponse(Process p) {
+String parseLightsResponse(Process p) {
     int level = 0;
     int numLights = 0;
     String currentObj = "root";
@@ -214,7 +140,7 @@ int checkLightsResponse(Process p) {
         }
         
         if (subpart == "error") {
-            return parseError(p);
+            return String(parseError(p));
         }
         
         if (level == 1 && subpart.toInt() > 0) {
@@ -244,36 +170,34 @@ int checkLightsResponse(Process p) {
     Bridge.put("nrOfLights", String(numLights));
     p.flush();
     p.close();
-    return 0;
+    return "success";
 }
 
 /**
  * Get the lights configuration
  */
-int getLightsConfig(String hueRL, String userName) {
-    //char url[lightsUrlLen(hueRL, userName)];
-    String url = buildLightsUrl(hueRL, userName);
-    
-    doGetRequest(url);
-    return checkLightsResponse(p);
+String getLightsConfig(String hueRL, String userName) {
+    return w.doGet(buildLightsUrl(hueRL, userName), parseLightsResponse);
 }
 
-int checkUserCreateResponse(Process p, char* userNameDest) {
+String parseUserCreateResponse(Process p) {
     // Examples:
     //[{"success":{"username":"27787d893751a7726400ccd3c6db19b"}}]
     //[{"error":{"type":101,"address":"/","description":"link button not pressed"}}]
-    
-    int returnCode = 0;
+
+    String output;
     bool isValid = true;
     while (p.available() > 0) {
         String subpart = p.readStringUntil('"');
         if (subpart == "error") {
             isValid = false;
+            output = "error";
         }
         if (!isValid && subpart == "type") {
-            returnCode = p.parseInt();
+            int returnCode = p.parseInt();
             Serial.print("Error code: ");
             Serial.println(returnCode);
+            output += ": " + returnCode;
         }
         if (!isValid && subpart == "description") {
             // Skip the colon - ": "
@@ -286,49 +210,43 @@ int checkUserCreateResponse(Process p, char* userNameDest) {
         if (subpart == "username") {
             // Skip the colon - ": "
             p.readStringUntil('"');
-            int nrBytesRead = p.readBytesUntil('"', userNameDest, 32);
-            userNameDest[nrBytesRead] = 0; // terminate the string
-            Serial.print("New userName: ");
-            Serial.println(userNameDest);
+            output = p.readStringUntil('"');
+            Serial.println("New userName: " + output);
         }
     }
     Serial.flush();
     p.flush();
     p.close();
-    return returnCode;
+    return output;
 }
 
 /**
  * Do a new user registration
+ *
+ * Note that this method doesn't exit until there is a registered user
  */
-int doNewUserRegistration(String hueRL, char* userNameDest) {
+String doNewUserRegistration(String hueRL) {
     while (true) {
-        if (error = doPostRequest(hueRL, "{\"devicetype\":\"Arduino#BabyHue\"}")) {
-            return error;
-        };
+        String response = w.doPost(hueRL, "{\"devicetype\":\"Arduino#BabyHue\"}", parseUserCreateResponse);
         
-        switch (int returncode = checkUserCreateResponse(p, userNameDest)) {
-            case 0: // success
-                return 0;
-            case 101: // link button not pressed, this is mentioned in the error receiver
-                fadeForMillis(2000, 10);
-                continue;
-            default: // Some kind of error
-                error = returncode;
-                Serial.print("Unknown registration error: ");
-                Serial.println(error);
-                return returncode;
+        if (response.startsWith("error") || response == "") {
+            fadeForMillis(2000, 10);
+            continue;
         }
+        
+        return response;
     }
     // Should not happen... Generic error
     Serial.println("\r\n!!! Impossible state !!!");
-    return 1;
+    return "";
 }
 
 String getUser(String hueRL) {
-    // 16 byte hex / 32 nibble hex, just take it as a string
-    // the 33'rd char holds 0 for the string terminator
-    // char userName[33] = "27787d893751a7726400ccd3c6db19b";
+    /*
+     16 byte hex / 32 nibble hex, just take it as a string
+     the 33'rd char holds 0 for the string terminator
+     char userName[33] = "27787d893751a7726400ccd3c6db19b";
+    */
     
     // Get the user from the EEPROM
     EEPROM.get(configAddress, config);
@@ -336,10 +254,10 @@ String getUser(String hueRL) {
     // Check if we have a valid user by probing the first character and testing it on the Hue
     if (config.userName[0] > 0) {
         
-        int resp = getLightsConfig(hueRL, String(config.userName));
+        String resp = getLightsConfig(hueRL, String(config.userName));
         
         // Everything else means there is a problem and we need a new user
-        if (resp == 0) {
+        if (resp == "success") {
             return config.userName;
         }
     }
@@ -348,22 +266,23 @@ String getUser(String hueRL) {
     Serial.flush();
     
     // This method blocks until we have a user or an insolvable error
-    if (doNewUserRegistration(hueRL, config.userName) > 0) {
+    String newHueser = doNewUserRegistration(hueRL);
+    if (newHueser == "") {
         return "";
     }
     
-    Serial.print("Received user: ");
-    Serial.println(config.userName);
+    Serial.print("Received user: " + newHueser);
     Serial.flush();
-    
+
+    newHueser.toCharArray(config.userName, sizeof(config.userName));
     EEPROM.put(configAddress, config);
     
     // Get the lights configuration. If it fails there's nothing to do anymore
-    if (getLightsConfig(hueRL, config.userName) != 0) {
+    if (getLightsConfig(hueRL, config.userName) != "success") {
         return "";
     }
     
-    // All set
+    // All done
     return String(config.userName);
 }
 
@@ -372,34 +291,26 @@ String getLightIdFor(String lightName) {
     return "1";
 }
 
-void enableAlert(String hueRL, String hueser, String lightId, bool once = false) {
-    Serial.println("Enabling alert");
-    String url = buildAlertUrl(hueRL, hueser, lightId);
-    
-    doPutRequest(url, once ? "{\"alert\":\"select\"}" : "{\"alert\":\"lselect\"}");
-    
-    // write the result to serial
+String dumpResponseCallback(Process p) {
     while(p.available()) {
         char c = p.read();
         Serial.print(c);
     }
-    p.flush();
-    p.close();
+    Serial.println("");
+    Serial.flush();
+    return "";
+}
+
+void enableAlert(String hueRL, String hueser, String lightId, bool once = false) {
+    Serial.println("Enabling alert");
+    String url = buildAlertUrl(hueRL, hueser, lightId);
+    w.doPut(url, once ? "{\"alert\":\"select\"}" : "{\"alert\":\"lselect\"}", dumpResponseCallback);
 }
 
 void disableAlert(String hueRL, String hueser, String lightId) {
     Serial.println("Disabling alert");
     String url = buildAlertUrl(hueRL, hueser, lightId);
-    
-    doPutRequest(url, "{\"alert\":\"none\"}");
-    
-    // write the result to serial
-    while(p.available()) {
-        char c = p.read();
-        Serial.print(c);
-    }
-    p.flush();
-    p.close();
+    w.doPut(url, "{\"alert\":\"none\"}", dumpResponseCallback);
 }
 
 void setupHue() {
@@ -409,7 +320,7 @@ void setupHue() {
     while (hueRL == "") {
         hueRL = getHueRL();
         if (hueRL == "") {
-            fadeForMillis(6000, 10);
+            fadeForMillis(10000, 10);
         }
     }
      
