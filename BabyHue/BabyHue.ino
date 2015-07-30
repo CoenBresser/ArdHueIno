@@ -17,9 +17,13 @@ int led = 13;           // the pin that the LED is attached to
 int brightness = 0;    // how bright the LED is
 int fadeAmount = 5;    // how many points to fade the LED by
 
+// For some reason passing this as a parameter results in not being able to read the stream...
+Process p;
+
 /***** Private methods section *****/
 
-int doGetRequest(Process p, char* url) {
+int doGetRequest(String url) {
+    Serial.println("Execute GET on: " + url);
     p.begin("curl");
     p.addParameter("-L");
     p.addParameter("-k");
@@ -34,14 +38,33 @@ int doGetRequest(Process p, char* url) {
     return error;
 }
 
-int doPostRequest(Process p, char* url, String data) {
-    Serial.print("Execute POST on: ");
-    Serial.println(url);
+int doPostRequest(String url, String data) {
+    Serial.println("Execute POST on: " + url + ", with data: " + data);
     p.begin("curl");
     p.addParameter("-H");
     p.addParameter("\"Content-Type: application/json\"");
     p.addParameter("-X");
     p.addParameter("POST");
+    p.addParameter("-d");
+    p.addParameter(data);
+    p.addParameter(url);
+    if (error = p.run()) {
+        Serial.print("CURL error: ");
+        Serial.println(error);
+        Serial.flush();
+        p.flush();
+        p.close();
+    }
+    return error;
+}
+
+int doPutRequest(String url, String data) {
+    Serial.println("Execute PUT on: " + url + ", with data: " + data);
+    p.begin("curl");
+    p.addParameter("-H");
+    p.addParameter("\"Content-Type: application/json\"");
+    p.addParameter("-X");
+    p.addParameter("PUT");
     p.addParameter("-d");
     p.addParameter(data);
     p.addParameter(url);
@@ -82,12 +105,16 @@ struct Config {
 };
 Config config = { "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" };
 
-char* getHueRL() {
-    static char hueRL[40];
+String getHueRL() {
+    Serial.println("getHueRL");
     
-    if (true) {
-        Process p;
-        doGetRequest(p, "http://www.meethue.com/api/nupnp");
+    if (false) {
+        
+        if (doGetRequest("http://www.meethue.com/api/nupnp") > 0) {
+            Serial.println("error");
+            return "";
+        }
+        
         while (p.available()) {
             char c = p.read();
             Serial.print(c);
@@ -96,59 +123,51 @@ char* getHueRL() {
         p.close();
         Serial.flush();
     
-        return NULL;
+        return "";
     }
     
-    Process p;
-    if (doGetRequest(p, "http://www.meethue.com/api/nupnp") > 0) {
-        return NULL;
+    if (doGetRequest("http://www.meethue.com/api/nupnp") > 0) {
+        return "";
     }
+    
+    Serial.println("Parse hue locator answer");
+    Serial.flush();
     
     // Search for the 7th " in the string (e.g. [{"id":"001234556","internalipaddress":"192.168.2.2"}])
     // Ignore errors, this will be caught when trying to resolve
     for (int i = 0; i < 7; i++) {
-        p.readStringUntil('"');
+        String dump = p.readStringUntil('"');
     }
     
-    // Check if we have a valid address
-    char hueIP[15];
-    int nrBytes = p.readBytesUntil('"', hueIP, sizeof(hueIP));
+    // Get the address
+    String hueRL = "http://" + p.readStringUntil('"') + "/api/";
     p.flush();
     p.close();
     
-    hueRL[0] = 0;
-    strcat(hueRL, "http://");
-    strcat(hueRL, hueIP);
-    // There is a trailing space at the end now???... Short fix
-    hueRL[7 + nrBytes] = 0;
-    strcat(hueRL, "/api/");
     Bridge.put("HueRL", hueRL);
     
+    Serial.println(hueRL);
+    Serial.flush();
     return hueRL;
 }
 
-int lightsUrlLen(char* apiBase, char* userName) {
-    return strlen(apiBase) + strlen(userName) + strlen("lights/");
+int lightsUrlLen(String apiBase, String userName) {
+    // Note that the closing / for the user is in the lights url
+    return apiBase.length() + userName.length() + strlen("/lights/");
 }
 
-int buildLightsUrl(char* apiBase, char* userName, char* dest) {
-    strcpy(dest, apiBase);
-    strcat(dest, userName);
-    strcat(dest, "lights/");
-    return strlen(dest);
+String buildLightsUrl(String apiBase, String userName) {
+    // Note that the closing / for the user is in the lights url
+    return apiBase + userName + "/lights/";
 }
 
-int alertUrlLen(char* apiBase, char* userName, char* id) {
-    // Note that the trailing / for id is put in state
-    return lightsUrlLen(apiBase, userName) + strlen(id) + strlen("/state/");
+int alertUrlLen(String apiBase, String userName, String id) {
+    // Note that the closing / for id is put in state
+    return lightsUrlLen(apiBase, userName) + id.length() + strlen("/state/");
 }
 
-int buildAlertUrl(char* apiBase, char* userName, char* id, char* dest) {
-    buildLightsUrl(apiBase, userName, dest);
-    strcat(dest, id);
-    // Note that the trailing / for id is put in state
-    strcat(dest, "/state/");
-    return strlen(dest);
+String buildAlertUrl(String apiBase, String userName, String id) {
+    return buildLightsUrl(apiBase, userName) + id + "/state/";
 }
 
 int parseError(Process p) {
@@ -231,12 +250,11 @@ int checkLightsResponse(Process p) {
 /**
  * Get the lights configuration
  */
-int getLightsConfig(char* hueRL, char* userName) {
-    char url[lightsUrlLen(hueRL, userName)];
-    buildLightsUrl(hueRL, userName, url);
+int getLightsConfig(String hueRL, String userName) {
+    //char url[lightsUrlLen(hueRL, userName)];
+    String url = buildLightsUrl(hueRL, userName);
     
-    Process p;
-    doGetRequest(p, url);
+    doGetRequest(url);
     return checkLightsResponse(p);
 }
 
@@ -283,10 +301,9 @@ int checkUserCreateResponse(Process p, char* userNameDest) {
 /**
  * Do a new user registration
  */
-int doNewUserRegistration(char* hueRL, char* userNameDest) {
+int doNewUserRegistration(String hueRL, char* userNameDest) {
     while (true) {
-        Process p;
-        if (error = doPostRequest(p, hueRL, "{\"devicetype\":\"Arduino#BabyHue\"}")) {
+        if (error = doPostRequest(hueRL, "{\"devicetype\":\"Arduino#BabyHue\"}")) {
             return error;
         };
         
@@ -308,7 +325,7 @@ int doNewUserRegistration(char* hueRL, char* userNameDest) {
     return 1;
 }
 
-char* getUser(char* hueRL) {
+String getUser(String hueRL) {
     // 16 byte hex / 32 nibble hex, just take it as a string
     // the 33'rd char holds 0 for the string terminator
     // char userName[33] = "27787d893751a7726400ccd3c6db19b";
@@ -319,7 +336,7 @@ char* getUser(char* hueRL) {
     // Check if we have a valid user by probing the first character and testing it on the Hue
     if (config.userName[0] > 0) {
         
-        int resp = getLightsConfig(hueRL, config.userName);
+        int resp = getLightsConfig(hueRL, String(config.userName));
         
         // Everything else means there is a problem and we need a new user
         if (resp == 0) {
@@ -332,7 +349,7 @@ char* getUser(char* hueRL) {
     
     // This method blocks until we have a user or an insolvable error
     if (doNewUserRegistration(hueRL, config.userName) > 0) {
-        return NULL;
+        return "";
     }
     
     Serial.print("Received user: ");
@@ -343,26 +360,23 @@ char* getUser(char* hueRL) {
     
     // Get the lights configuration. If it fails there's nothing to do anymore
     if (getLightsConfig(hueRL, config.userName) != 0) {
-        return NULL;
+        return "";
     }
     
     // All set
-    return config.userName;
+    return String(config.userName);
 }
 
-char* getLightIdFor(char* lightName) {
+String getLightIdFor(String lightName) {
     // TODO: Get from Brigde
-    static char id[3] = "1\0";
-    return id;
+    return "1";
 }
 
-void enableAlert(char* hueRL, char* hueser, char* lightId, bool once = false) {
+void enableAlert(String hueRL, String hueser, String lightId, bool once = false) {
     Serial.println("Enabling alert");
-    Process p;
-    char url[alertUrlLen(hueRL, hueRL, lightId)];
-    buildAlertUrl(hueRL, hueser, lightId, url);
+    String url = buildAlertUrl(hueRL, hueser, lightId);
     
-    doPostRequest(p, url, once ? "{\"alert\":\"select\"}" : "{\"alert\":\"lselect\"}");
+    doPutRequest(url, once ? "{\"alert\":\"select\"}" : "{\"alert\":\"lselect\"}");
     
     // write the result to serial
     while(p.available()) {
@@ -373,13 +387,11 @@ void enableAlert(char* hueRL, char* hueser, char* lightId, bool once = false) {
     p.close();
 }
 
-void disableAlert(char* hueRL, char* hueser, char* lightId) {
+void disableAlert(String hueRL, String hueser, String lightId) {
     Serial.println("Disabling alert");
-    Process p;
-    char url[alertUrlLen(hueRL, hueRL, lightId)];
-    buildAlertUrl(hueRL, hueser, lightId, url);
+    String url = buildAlertUrl(hueRL, hueser, lightId);
     
-    doPostRequest(p, url, "{\"alert\":\"none\"}");
+    doPutRequest(url, "{\"alert\":\"none\"}");
     
     // write the result to serial
     while(p.available()) {
@@ -391,22 +403,24 @@ void disableAlert(char* hueRL, char* hueser, char* lightId) {
 }
 
 void setupHue() {
-    char* hueRL = NULL;
-    while (true || hueRL == NULL) {
+    Serial.println("Setup Hue");
+    
+    String hueRL = "";
+    while (hueRL == "") {
         hueRL = getHueRL();
-        if (hueRL == NULL) {
+        if (hueRL == "") {
             fadeForMillis(6000, 10);
         }
     }
-/*
+     
     Serial.print("Using Hue on: ");
     Serial.println(hueRL);
     
-    char* hueser = getUser(hueRL);
+    String hueser = getUser(hueRL);
     Serial.print("Using username: ");
     Serial.println(hueser);
     Serial.flush();
-    if (hueser == NULL) {
+    if (hueser == "") {
         return;
     }
     
@@ -419,7 +433,6 @@ void setupHue() {
     disableAlert(hueRL, hueser, getLightIdFor("Color Light"));
     
     Serial.flush();
- */
 }
 
 /***** Public methods section *****/

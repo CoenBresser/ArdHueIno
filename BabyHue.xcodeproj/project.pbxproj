@@ -75,6 +75,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2026E0D61B6A4415005B6C61 /* WebCalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCalls.h; sourceTree = "<group>"; };
 		2035D6201B5D9503001AFE23 /* Index */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Index; sourceTree = BUILT_PRODUCTS_DIR; };
 		2035D6231B5D9503001AFE23 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		2035D6251B5D9503001AFE23 /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -289,6 +290,7 @@
 				2035D6781B5D9503001AFE23 /* Makefiles */,
 				2035D6961B5D9503001AFE23 /* About */,
 				2035D6981B5D9503001AFE23 /* Utilities */,
+				2026E0D61B6A4415005B6C61 /* WebCalls.h */,
 			);
 			path = BabyHue;
 			sourceTree = "<group>";
