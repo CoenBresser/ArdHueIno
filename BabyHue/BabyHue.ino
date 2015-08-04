@@ -24,6 +24,7 @@ Hue hue;
 
 /***** Private methods section *****/
 
+
 void setupHue() {
     logger.info("Hue init");
     hue.begin();
@@ -33,7 +34,6 @@ void setupHue() {
     
     // Enable alert on the light called "Color Light"
     hue.enableAlert("Color Light");
-    
     LedControl::fadeForMillis(10000, 1);
     hue.disableAlert("Color Light");
 }
@@ -55,5 +55,5 @@ void setup() {
 }
 
 void loop() {
-    LedControl::fadeForMillis(5000, error ? 25 : 5);
+    LedControl::fadeForMillis(5000, 5);
 }
