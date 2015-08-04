@@ -24,8 +24,12 @@ void LedControl::fadeForMillis(int totalTime, int stepSize, int led, int delayTi
         brightness = brightness + fadeAmount;
         
         // reverse the direction of the fading at the ends of the fade:
-        if (brightness == 0 || brightness == 255) {
-            fadeAmount = -fadeAmount;
+        if (brightness <= 0) {
+            brightness = 0;
+            fadeAmount = stepSize;
+        } else if (brightness >= 255) {
+            brightness = 255;
+            fadeAmount = -stepSize;
         }
         delay(delayTime);
     }

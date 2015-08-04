@@ -12,6 +12,7 @@
 		2026E0DB1B6A4F7A005B6C61 /* HueWebCalls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */; };
 		2035D6241B5D9503001AFE23 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6231B5D9503001AFE23 /* main.cpp */; };
 		2035D6291B5D9503001AFE23 /* LocalLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6281B5D9503001AFE23 /* LocalLibrary.cpp */; };
+		2056D09A1B7101A600D21BC6 /* Hue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2056D0981B7101A600D21BC6 /* Hue.cpp */; };
 		205F38CC1B6ABC06002C7F1A /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38CA1B6ABC06002C7F1A /* Logger.cpp */; };
 		205F38CF1B6B9D18002C7F1A /* LedControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38CD1B6B9D18002C7F1A /* LedControl.cpp */; };
 		205F38D21B70CFB9002C7F1A /* SerialLogWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38D01B70CFB9002C7F1A /* SerialLogWriter.cpp */; };
@@ -201,6 +202,8 @@
 		2035D69E1B5D9503001AFE23 /* TemplateIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TemplateIcon.icns; path = Utilities/TemplateIcon.icns; sourceTree = "<group>"; };
 		2035D69F1B5D9503001AFE23 /* uploader_izmir.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = uploader_izmir.sh; path = Utilities/uploader_izmir.sh; sourceTree = "<group>"; };
 		2035D6A01B5D9503001AFE23 /* BabyHue.ino */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = BabyHue.ino; sourceTree = "<group>"; };
+		2056D0981B7101A600D21BC6 /* Hue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Hue.cpp; sourceTree = "<group>"; };
+		2056D0991B7101A600D21BC6 /* Hue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hue.h; sourceTree = "<group>"; };
 		205F38CA1B6ABC06002C7F1A /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		205F38CB1B6ABC06002C7F1A /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		205F38CD1B6B9D18002C7F1A /* LedControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LedControl.cpp; sourceTree = "<group>"; };
@@ -312,6 +315,8 @@
 				2056D0971B70FAB300D21BC6 /* Logging */,
 				205F38CD1B6B9D18002C7F1A /* LedControl.cpp */,
 				205F38CE1B6B9D18002C7F1A /* LedControl.h */,
+				2056D0981B7101A600D21BC6 /* Hue.cpp */,
+				2056D0991B7101A600D21BC6 /* Hue.h */,
 			);
 			path = BabyHue;
 			sourceTree = "<group>";
@@ -934,6 +939,7 @@
 				AA2A150730090325AA000045 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000047 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000049 /* pins_arduino.h in Sources */,
+				2056D09A1B7101A600D21BC6 /* Hue.cpp in Sources */,
 				AA2A150730090325AA00004B /* pins_arduino.h in Sources */,
 				AA2A150730090325AA00004D /* pins_arduino.h in Sources */,
 				AA2A150730090325AA00004F /* pins_arduino.h in Sources */,

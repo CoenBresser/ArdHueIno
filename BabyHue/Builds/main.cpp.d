@@ -21,4 +21,4 @@ Builds/main.cpp.o: main.cpp \
  /Applications/Arduino.app/Contents/Java/hardware/arduino/avr/libraries/EEPROM/EEPROM.h \
  Logger.h SerialLogWriter.h FileLogWriter.h \
  /Applications/Arduino.app/Contents/Java/libraries/Bridge/src/FileIO.h \
- TwoLogWriters.h HueWebCalls.h LedControl.h
+ TwoLogWriters.h Hue.h LedControl.h
