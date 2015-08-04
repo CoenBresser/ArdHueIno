@@ -35,9 +35,10 @@
 
 
 #include <Process.h>
+#include "Logger.h"
 
-typedef String (*WebCallbackType)(Process);
-typedef void (*WebErrorCallbackType)(Process p, int exitValue);
+typedef String (*WebCallbackType)(Stream&);
+typedef void (*WebErrorCallbackType)(Stream&, int);
 
 class HueWebCalls {
 public:
@@ -50,6 +51,7 @@ public:
     
 private:
     boolean started;
+    Logger logger;
     
 };
 

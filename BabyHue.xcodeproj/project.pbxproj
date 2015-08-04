@@ -12,6 +12,8 @@
 		2026E0DB1B6A4F7A005B6C61 /* HueWebCalls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */; };
 		2035D6241B5D9503001AFE23 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6231B5D9503001AFE23 /* main.cpp */; };
 		2035D6291B5D9503001AFE23 /* LocalLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6281B5D9503001AFE23 /* LocalLibrary.cpp */; };
+		205F38CC1B6ABC06002C7F1A /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38CA1B6ABC06002C7F1A /* Logger.cpp */; };
+		205F38CF1B6B9D18002C7F1A /* LedControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38CD1B6B9D18002C7F1A /* LedControl.cpp */; };
 		AA2A150730090325AA000006 /* abi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000006 /* abi.cpp */; };
 		AA2A150730090325AA000007 /* Arduino.h in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000007 /* Arduino.h */; };
 		AA2A150730090325AA000008 /* binary.h in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000008 /* binary.h */; };
@@ -196,6 +198,10 @@
 		2035D69E1B5D9503001AFE23 /* TemplateIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TemplateIcon.icns; path = Utilities/TemplateIcon.icns; sourceTree = "<group>"; };
 		2035D69F1B5D9503001AFE23 /* uploader_izmir.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = uploader_izmir.sh; path = Utilities/uploader_izmir.sh; sourceTree = "<group>"; };
 		2035D6A01B5D9503001AFE23 /* BabyHue.ino */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = BabyHue.ino; sourceTree = "<group>"; };
+		205F38CA1B6ABC06002C7F1A /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
+		205F38CB1B6ABC06002C7F1A /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
+		205F38CD1B6B9D18002C7F1A /* LedControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LedControl.cpp; sourceTree = "<group>"; };
+		205F38CE1B6B9D18002C7F1A /* LedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LedControl.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000006 /* abi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = abi.cpp; sourceTree = "<group>"; };
 		AAAA150730090325AA000007 /* Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arduino.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000008 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary.h; sourceTree = "<group>"; };
@@ -294,6 +300,10 @@
 				2035D6981B5D9503001AFE23 /* Utilities */,
 				2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */,
 				2026E0DA1B6A4F7A005B6C61 /* HueWebCalls.h */,
+				205F38CA1B6ABC06002C7F1A /* Logger.cpp */,
+				205F38CB1B6ABC06002C7F1A /* Logger.h */,
+				205F38CD1B6B9D18002C7F1A /* LedControl.cpp */,
+				205F38CE1B6B9D18002C7F1A /* LedControl.h */,
 			);
 			path = BabyHue;
 			sourceTree = "<group>";
@@ -860,6 +870,7 @@
 				AA2A150730090325AA000018 /* new.h in Sources */,
 				AA2A150730090325AA000019 /* Print.cpp in Sources */,
 				AA2A150730090325AA00001A /* Print.h in Sources */,
+				205F38CC1B6ABC06002C7F1A /* Logger.cpp in Sources */,
 				AA2A150730090325AA00001B /* Printable.h in Sources */,
 				AA2A150730090325AA00001C /* Server.h in Sources */,
 				AA2A150730090325AA00001D /* Stream.cpp in Sources */,
@@ -891,6 +902,7 @@
 				AA2A150730090325AA00003D /* Wire.cpp in Sources */,
 				AA2A150730090325AA00003E /* Wire.h in Sources */,
 				2026E0DB1B6A4F7A005B6C61 /* HueWebCalls.cpp in Sources */,
+				205F38CF1B6B9D18002C7F1A /* LedControl.cpp in Sources */,
 				AA2A150730090325AA000041 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000043 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000045 /* pins_arduino.h in Sources */,

@@ -11,6 +11,7 @@
 
 #include <EEPROM.h>
 
+#include "Logger.h"
 #include "HueWebCalls.h"
 
 int error = 0;        // global error codes to enable visual feedback
@@ -22,6 +23,7 @@ int fadeAmount = 5;    // how many points to fade the LED by
 // For some reason passing this as a parameter results in not being able to read the stream...
 Process p;
 HueWebCalls w;
+Logger logger;
 
 /***** Private methods section *****/
 
@@ -64,7 +66,7 @@ String parseHueLocationAnswer(Process p) {
 }
 
 String getHueRL() {
-    String hueRL = w.doGet("http://www.meethue.com/api/nupnp", [] (Process p) -> String {
+    String hueRL = w.doGet("http://www.meethue.com/api/nupnp", [] (Stream& p) -> String {
         // Search for the 7th " in the string (e.g. [{"id":"001234556","internalipaddress":"192.168.2.2"}])
         // Ignore errors, this will be caught when trying to resolve
         for (int i = 0; i < 7; i++) {
@@ -97,29 +99,25 @@ String buildAlertUrl(String apiBase, String userName, String id) {
     return buildLightsUrl(apiBase, userName) + id + "/state/";
 }
 
-int parseError(Process p) {
+int parseError(Stream& p) {
     // Set the error to a generic error
     int returnCode = 1;
     while (p.available() > 0) {
         String subpart = p.readStringUntil('"');
         if (subpart == "type") {
             returnCode = p.parseInt();
-            Serial.print("Error code: ");
-            Serial.println(returnCode);
+            logger.error("Error code: " + returnCode);
         }
         if (subpart == "description") {
             // Skip the colon - ": "
             p.readStringUntil('"');
-            Serial.println(p.readStringUntil('"'));
+            logger.error(p.readStringUntil('"'));
         }
     }
-    Serial.flush();
-    p.flush();
-    p.close();
     return returnCode;
 }
 
-String parseLightsResponse(Process p) {
+String parseLightsResponse(Stream& p) {
     int level = 0;
     int numLights = 0;
     String currentObj = "root";
@@ -168,8 +166,6 @@ String parseLightsResponse(Process p) {
         }
     }
     Bridge.put("nrOfLights", String(numLights));
-    p.flush();
-    p.close();
     return "success";
 }
 
@@ -180,7 +176,7 @@ String getLightsConfig(String hueRL, String userName) {
     return w.doGet(buildLightsUrl(hueRL, userName), parseLightsResponse);
 }
 
-String parseUserCreateResponse(Process p) {
+String parseUserCreateResponse(Stream& p) {
     // Examples:
     //[{"success":{"username":"27787d893751a7726400ccd3c6db19b"}}]
     //[{"error":{"type":101,"address":"/","description":"link button not pressed"}}]
@@ -195,14 +191,13 @@ String parseUserCreateResponse(Process p) {
         }
         if (!isValid && subpart == "type") {
             int returnCode = p.parseInt();
-            Serial.print("Error code: ");
-            Serial.println(returnCode);
+            logger.error("Error code: " + returnCode);
             output += ": " + returnCode;
         }
         if (!isValid && subpart == "description") {
             // Skip the colon - ": "
             p.readStringUntil('"');
-            Serial.println(p.readStringUntil('"'));
+            logger.error(p.readStringUntil('"'));
         }
         if (subpart == "success") {
             isValid = true;
@@ -211,12 +206,9 @@ String parseUserCreateResponse(Process p) {
             // Skip the colon - ": "
             p.readStringUntil('"');
             output = p.readStringUntil('"');
-            Serial.println("New userName: " + output);
+            logger.info("New userName: " + output);
         }
     }
-    Serial.flush();
-    p.flush();
-    p.close();
     return output;
 }
 
@@ -237,7 +229,8 @@ String doNewUserRegistration(String hueRL) {
         return response;
     }
     // Should not happen... Generic error
-    Serial.println("\r\n!!! Impossible state !!!");
+    logger.fail("!!! Impossible state !!!");
+    exit(0);
     return "";
 }
 
@@ -262,8 +255,8 @@ String getUser(String hueRL) {
         }
     }
     
-    Serial.println("No (valid) user, setting up a new one");
-    Serial.flush();
+    logger.info("No (valid) user, setting up a new one");
+    
     
     // This method blocks until we have a user or an insolvable error
     String newHueser = doNewUserRegistration(hueRL);
@@ -271,8 +264,8 @@ String getUser(String hueRL) {
         return "";
     }
     
-    Serial.print("Received user: " + newHueser);
-    Serial.flush();
+    logger.info("Received user: " + newHueser);
+    
 
     newHueser.toCharArray(config.userName, sizeof(config.userName));
     EEPROM.put(configAddress, config);
@@ -291,31 +284,24 @@ String getLightIdFor(String lightName) {
     return "1";
 }
 
-String dumpResponseCallback(Process p) {
-    while(p.available()) {
-        char c = p.read();
-        Serial.print(c);
-    }
-    Serial.println("");
-    Serial.flush();
+String dumpResponseCallback(Stream& p) {
+    logger.dumpStream(p, Logger::Trace);
     return "";
 }
 
 void enableAlert(String hueRL, String hueser, String lightId, bool once = false) {
-    Serial.println("Enabling alert");
+    logger.trace("Enabling alert");
     String url = buildAlertUrl(hueRL, hueser, lightId);
     w.doPut(url, once ? "{\"alert\":\"select\"}" : "{\"alert\":\"lselect\"}", dumpResponseCallback);
 }
 
 void disableAlert(String hueRL, String hueser, String lightId) {
-    Serial.println("Disabling alert");
+    logger.trace("Disabling alert");
     String url = buildAlertUrl(hueRL, hueser, lightId);
     w.doPut(url, "{\"alert\":\"none\"}", dumpResponseCallback);
 }
 
 void setupHue() {
-    Serial.println("Setup Hue");
-    
     String hueRL = "";
     while (hueRL == "") {
         hueRL = getHueRL();
@@ -323,46 +309,47 @@ void setupHue() {
             fadeForMillis(10000, 10);
         }
     }
-     
-    Serial.print("Using Hue on: ");
-    Serial.println(hueRL);
+    
+    logger.info("Using Hue on: " + hueRL);
     
     String hueser = getUser(hueRL);
-    Serial.print("Using username: ");
-    Serial.println(hueser);
-    Serial.flush();
+    logger.info("Using username: " + hueser);
+    
     if (hueser == "") {
         return;
     }
     
     // We have a valid Hue configuration now
-    Serial.println("Manipulating lights now");
+    logger.info("Manipulating lights now");
     
     // Enable alert on the light called "Color Light"
     enableAlert(hueRL, hueser, getLightIdFor("Color Light"));
     fadeForMillis(10000, 40);
     disableAlert(hueRL, hueser, getLightIdFor("Color Light"));
-    
-    Serial.flush();
 }
 
 /***** Public methods section *****/
 
 void setup() {
-    pinMode(led, OUTPUT);
+    logger.info("Started");
     
     // Initialize Bridge
+    logger.info("Bridge init");
     Bridge.begin();
     
     // Initialize Serial
+    logger.info("Serial init");
     Serial.begin(9600);
     
     // Wait until a Serial Monitor is connected.
-    while (!Serial) {
+    pinMode(led, OUTPUT);
+    int cycles = 3;
+    while (!Serial && cycles-- > 0) {
         fadeForMillis(1000, 3);
     }
     
     // Do the hue setup
+    logger.info("Hue init");
     setupHue();
 }
 

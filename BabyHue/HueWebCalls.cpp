@@ -9,7 +9,7 @@
 #include "HueWebCalls.h"
 
 String HueWebCalls::doGet(String url, WebCallbackType callback, WebErrorCallbackType errorCallback) {
-    Serial.println("Execute GET on: " + url);
+    logger.trace("Execute GET on: " + url);
     Process p;
     p.begin("curl");
     p.addParameter("-L");
@@ -36,7 +36,7 @@ String HueWebCalls::doGet(String url, WebCallbackType callback, WebErrorCallback
 }
 
 String HueWebCalls::doPut(String url, String data, WebCallbackType callback, WebErrorCallbackType errorCallback) {
-    Serial.println("Execute PUT on: " + url + ", with data: " + data);
+    logger.trace("Execute PUT on: " + url + ", with data: " + data);
     Process p;
     p.begin("curl");
     p.addParameter("-H");
