@@ -12,7 +12,11 @@
 #include <EEPROM.h>
 
 #include "Logger.h"
+#include "SerialLogWriter.h"
+#include "FileLogWriter.h"
+#include "TwoLogWriters.h"
 #include "HueWebCalls.h"
+#include "LedControl.h"
 
 int error = 0;        // global error codes to enable visual feedback
 
@@ -26,24 +30,6 @@ HueWebCalls w;
 Logger logger;
 
 /***** Private methods section *****/
-
-void fadeForMillis(unsigned int totalTime, int delayTime) {
-    for (int i = 0; i <= totalTime / delayTime; i++) {
-        // set the brightness of the LED pin:
-        analogWrite(led, brightness);
-        
-        // change the brightness for next time through the loop:
-        brightness = brightness + fadeAmount;
-        
-        // reverse the direction of the fading at the ends of the fade:
-        if (brightness == 0 || brightness == 255) {
-            fadeAmount = -fadeAmount;
-        }
-        // wait to see the dimming effect
-        delay(delayTime);
-    }
-    analogWrite(led, 0);
-}
 
 // EEPROM Start address to read from
 // TODO: make this a setting when creating a class
@@ -222,7 +208,7 @@ String doNewUserRegistration(String hueRL) {
         String response = w.doPost(hueRL, "{\"devicetype\":\"Arduino#BabyHue\"}", parseUserCreateResponse);
         
         if (response.startsWith("error") || response == "") {
-            fadeForMillis(2000, 10);
+            LedControl::fadeForMillis(2000, 10);
             continue;
         }
         
@@ -306,7 +292,7 @@ void setupHue() {
     while (hueRL == "") {
         hueRL = getHueRL();
         if (hueRL == "") {
-            fadeForMillis(10000, 10);
+            LedControl::fadeForMillis(10000, 10);
         }
     }
     
@@ -324,29 +310,21 @@ void setupHue() {
     
     // Enable alert on the light called "Color Light"
     enableAlert(hueRL, hueser, getLightIdFor("Color Light"));
-    fadeForMillis(10000, 40);
+    LedControl::fadeForMillis(10000, 40);
     disableAlert(hueRL, hueser, getLightIdFor("Color Light"));
 }
 
 /***** Public methods section *****/
 
 void setup() {
-    logger.info("Started");
-    
-    // Initialize Bridge
-    logger.info("Bridge init");
     Bridge.begin();
     
-    // Initialize Serial
-    logger.info("Serial init");
-    Serial.begin(9600);
+    SerialLogWriter sLog;
+    FileLogWriter fLog;
+    TwoLogWriters tLogs = TwoLogWriters(fLog, sLog);
+    logger.registerLogWriter(tLogs);
     
-    // Wait until a Serial Monitor is connected.
-    pinMode(led, OUTPUT);
-    int cycles = 3;
-    while (!Serial && cycles-- > 0) {
-        fadeForMillis(1000, 3);
-    }
+    logger.info("Started");
     
     // Do the hue setup
     logger.info("Hue init");
@@ -354,5 +332,5 @@ void setup() {
 }
 
 void loop() {
-    fadeForMillis(5000, error ? 20 : 5);
+    LedControl::fadeForMillis(5000, error ? 20 : 5);
 }

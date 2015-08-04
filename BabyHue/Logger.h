@@ -12,6 +12,18 @@
 #include <Bridge.h>
 
 /**
+ * Interface to implement when writing a logwriter
+ */
+class iLogWriter {
+public:
+    virtual size_t write(const char str[]) = 0;
+    virtual size_t write(char c) = 0;
+    virtual size_t writeln(const char c[]) = 0;
+    virtual size_t writeln(const String &s) = 0;
+    virtual void flush() = 0;
+};
+
+/**
  * Logger class to write to a log destination (Serial, FileIO)
  *
  * None of the methods are blocking so if a serial port is not available, it will be skipped
@@ -36,9 +48,13 @@ public:
     void setLogLevel(LogLevel level);
     LogLevel getLogLevel();
     
+    // Method to register a log writers. There is room for 2 at the moment
+    void registerLogWriter(iLogWriter& writer);
+    
 private:
     boolean started;
     LogLevel logLevel;
+    iLogWriter *logWriter;
 };
 
 #endif /* defined(__BabyHue__Logger__) */

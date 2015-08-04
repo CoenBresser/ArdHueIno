@@ -17,50 +17,72 @@ Logger::LogLevel Logger::getLogLevel() {
 }
 
 void Logger::dumpStream(Stream &s, LogLevel level) {
+    if (!logWriter) {
+        return;
+    }
     if (logLevel <= level && Serial) {
-        Serial.print("DMP - ");
+        logWriter->write("DMP - ");
         while (s.available()) {
             char c = s.read();
-            Serial.print(c);
+            logWriter->write(c);
         }
-        Serial.println("");
-        Serial.flush();
+        logWriter->writeln("");
+        logWriter->flush();
     } else {
         s.flush();
     }
 }
 
 void Logger::trace(String trace) {
+    if (!logWriter) {
+        return;
+    }
     if (logLevel <= Trace && Serial) {
-        Serial.println("TRC - " + trace);
-        Serial.flush();
+        logWriter->writeln("TRC - " + trace);
+        logWriter->flush();
     }
 }
 
 void Logger::debug(String debug) {
+    if (!logWriter) {
+        return;
+    }
     if (logLevel <= Debug && Serial) {
-        Serial.println("DBG - " + debug);
-        Serial.flush();
+        logWriter->writeln("DBG - " + debug);
+        logWriter->flush();
     }
 }
 
 void Logger::info(String info) {
+    if (!logWriter) {
+        return;
+    }
     if (logLevel <= Info && Serial) {
-        Serial.println("INF - " + info);
-        Serial.flush();
+        logWriter->writeln("INF - " + info);
+        logWriter->flush();
     }
 }
 
 void Logger::error(String error) {
+    if (!logWriter) {
+        return;
+    }
     if (logLevel <= Error && Serial) {
-        Serial.println("ERR - " + error);
-        Serial.flush();
+        logWriter->writeln("ERR - " + error);
+        logWriter->flush();
     }
 }
 
 void Logger::fail(String fail) {
-    if (logLevel <= Fail && Serial) {
-        Serial.println("FAIL! - " + fail);
-        Serial.flush();
+    if (!logWriter) {
+        return;
     }
+    if (logLevel <= Fail && Serial) {
+        logWriter->writeln("FAIL! - " + fail);
+        logWriter->flush();
+    }
+}
+
+void Logger::registerLogWriter(iLogWriter& writer) {
+    logWriter = &writer;
 }

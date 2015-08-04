@@ -14,6 +14,9 @@
 		2035D6291B5D9503001AFE23 /* LocalLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6281B5D9503001AFE23 /* LocalLibrary.cpp */; };
 		205F38CC1B6ABC06002C7F1A /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38CA1B6ABC06002C7F1A /* Logger.cpp */; };
 		205F38CF1B6B9D18002C7F1A /* LedControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38CD1B6B9D18002C7F1A /* LedControl.cpp */; };
+		205F38D21B70CFB9002C7F1A /* SerialLogWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38D01B70CFB9002C7F1A /* SerialLogWriter.cpp */; };
+		205F38D61B70D88F002C7F1A /* TwoLogWriters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38D41B70D88F002C7F1A /* TwoLogWriters.cpp */; };
+		205F38D91B70DADA002C7F1A /* FileLogWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 205F38D71B70DADA002C7F1A /* FileLogWriter.cpp */; };
 		AA2A150730090325AA000006 /* abi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000006 /* abi.cpp */; };
 		AA2A150730090325AA000007 /* Arduino.h in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000007 /* Arduino.h */; };
 		AA2A150730090325AA000008 /* binary.h in Sources */ = {isa = PBXBuildFile; fileRef = AAAA150730090325AA000008 /* binary.h */; };
@@ -202,6 +205,12 @@
 		205F38CB1B6ABC06002C7F1A /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		205F38CD1B6B9D18002C7F1A /* LedControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LedControl.cpp; sourceTree = "<group>"; };
 		205F38CE1B6B9D18002C7F1A /* LedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LedControl.h; sourceTree = "<group>"; };
+		205F38D01B70CFB9002C7F1A /* SerialLogWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SerialLogWriter.cpp; sourceTree = "<group>"; };
+		205F38D11B70CFB9002C7F1A /* SerialLogWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SerialLogWriter.h; sourceTree = "<group>"; };
+		205F38D41B70D88F002C7F1A /* TwoLogWriters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TwoLogWriters.cpp; sourceTree = "<group>"; };
+		205F38D51B70D88F002C7F1A /* TwoLogWriters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoLogWriters.h; sourceTree = "<group>"; };
+		205F38D71B70DADA002C7F1A /* FileLogWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileLogWriter.cpp; sourceTree = "<group>"; };
+		205F38D81B70DADA002C7F1A /* FileLogWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileLogWriter.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000006 /* abi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = abi.cpp; sourceTree = "<group>"; };
 		AAAA150730090325AA000007 /* Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arduino.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000008 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary.h; sourceTree = "<group>"; };
@@ -300,8 +309,7 @@
 				2035D6981B5D9503001AFE23 /* Utilities */,
 				2026E0D91B6A4F7A005B6C61 /* HueWebCalls.cpp */,
 				2026E0DA1B6A4F7A005B6C61 /* HueWebCalls.h */,
-				205F38CA1B6ABC06002C7F1A /* Logger.cpp */,
-				205F38CB1B6ABC06002C7F1A /* Logger.h */,
+				2056D0971B70FAB300D21BC6 /* Logging */,
 				205F38CD1B6B9D18002C7F1A /* LedControl.cpp */,
 				205F38CE1B6B9D18002C7F1A /* LedControl.h */,
 			);
@@ -451,6 +459,21 @@
 				2035D69F1B5D9503001AFE23 /* uploader_izmir.sh */,
 			);
 			name = Utilities;
+			sourceTree = "<group>";
+		};
+		2056D0971B70FAB300D21BC6 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				205F38CA1B6ABC06002C7F1A /* Logger.cpp */,
+				205F38CB1B6ABC06002C7F1A /* Logger.h */,
+				205F38D01B70CFB9002C7F1A /* SerialLogWriter.cpp */,
+				205F38D41B70D88F002C7F1A /* TwoLogWriters.cpp */,
+				205F38D51B70D88F002C7F1A /* TwoLogWriters.h */,
+				205F38D11B70CFB9002C7F1A /* SerialLogWriter.h */,
+				205F38D71B70DADA002C7F1A /* FileLogWriter.cpp */,
+				205F38D81B70DADA002C7F1A /* FileLogWriter.h */,
+			);
+			name = Logging;
 			sourceTree = "<group>";
 		};
 		AAAA150730090325AA000000 /* Resources */ = {
@@ -861,6 +884,7 @@
 				AA2A150730090325AA00000F /* HardwareSerial2.cpp in Sources */,
 				AA2A150730090325AA000010 /* HardwareSerial3.cpp in Sources */,
 				AA2A150730090325AA000011 /* HardwareSerial_private.h in Sources */,
+				205F38D61B70D88F002C7F1A /* TwoLogWriters.cpp in Sources */,
 				AA2A150730090325AA000012 /* HID.cpp in Sources */,
 				AA2A150730090325AA000013 /* hooks.c in Sources */,
 				AA2A150730090325AA000014 /* IPAddress.cpp in Sources */,
@@ -880,7 +904,9 @@
 				AA2A150730090325AA000021 /* USBAPI.h in Sources */,
 				AA2A150730090325AA000022 /* USBCore.cpp in Sources */,
 				AA2A150730090325AA000023 /* USBCore.h in Sources */,
+				205F38D91B70DADA002C7F1A /* FileLogWriter.cpp in Sources */,
 				AA2A150730090325AA000024 /* USBDesc.h in Sources */,
+				205F38D21B70CFB9002C7F1A /* SerialLogWriter.cpp in Sources */,
 				AA2A150730090325AA000025 /* WCharacter.h in Sources */,
 				AA2A150730090325AA000026 /* WInterrupts.c in Sources */,
 				AA2A150730090325AA000027 /* wiring.c in Sources */,

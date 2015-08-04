@@ -11,4 +11,17 @@
 
 #include <stdio.h>
 
+class LedControl {
+public:
+    LedControl() { }
+    
+    //
+    // A blocking method to fade an led
+    // The method uses fixed delay times and a variable step, else timing can be off
+    //
+    // default LED is 13
+    // default Delay is 20ms if slower the steps in the fade effect will be visible
+    //
+    static void fadeForMillis(int totalTime, int stepSize, int led = 13, int delayTime = 20);
+};
 #endif /* defined(__BabyHue__LedControl__) */
