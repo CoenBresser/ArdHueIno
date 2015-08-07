@@ -23,21 +23,25 @@ public:
     virtual void flush() = 0;
 };
 
+#define LOG_LEVEL_TRACE 5
+#define LOG_LEVEL_DEBUG 4
+#define LOG_LEVEL_INFO 3
+#define LOG_LEVEL_ERROR 2
+#define LOG_LEVEL_FAIL 1
+#define LOG_LEVEL_NONE 0
+
 /**
  * Logger class to write to a log destination (Serial, FileIO)
  *
  * None of the methods are blocking so if a serial port is not available, it will be skipped
  * Note that initialization of the serial port is not done here
  */
-class Logger {
+class Logger_ {
 public:
-    enum LogLevel { Trace, Debug, Info, Error, Fail, None };
     
-    Logger(LogLevel level = Info) : started(true) {
-        logLevel = level;
-    }
+    Logger_(int logLevel = LOG_LEVEL_INFO) : started(true), logLevel(logLevel) { }
     
-    void dumpStream(Stream& stream, LogLevel level);
+    void dumpStream(Stream& stream, int logLevel);
     
     void trace(String trace);
     void debug(String debug);
@@ -45,16 +49,19 @@ public:
     void error(String error);
     void fail(String fail);
     
-    void setLogLevel(LogLevel level);
-    LogLevel getLogLevel();
+    void setLogLevel(int logLevel);
+    int getLogLevel();
     
     // Method to register a log writers. There is room for 2 at the moment
     void registerLogWriter(iLogWriter& writer);
     
 private:
     boolean started;
-    LogLevel logLevel;
+    int logLevel;
     iLogWriter *logWriter;
 };
+
+extern Logger_ Logger;
+
 
 #endif /* defined(__BabyHue__Logger__) */

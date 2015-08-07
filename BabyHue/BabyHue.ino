@@ -19,23 +19,22 @@
 #include "LedControl.h"
 
 // For some reason passing this as a parameter results in not being able to read the stream...
-Logger logger;
-Hue hue;
+SerialLogWriter sLog;
+FileLogWriter fLog;
+TwoLogWriters tLog = TwoLogWriters(fLog, sLog);
 
 /***** Private methods section *****/
 
 
 void setupHue() {
-    logger.info("Hue init");
-    hue.begin();
+    Logger.info("Hue init");
+    Hue.begin([] () { LedControl::fadeForMillis(10000, 10); });
     
     // We have a valid Hue configuration now
-    logger.info("Notifying we're there");
+    Logger.info("Notifying we're there");
     
     // Enable alert on the light called "Color Light"
-    hue.enableAlert("Color Light");
-    LedControl::fadeForMillis(10000, 1);
-    hue.disableAlert("Color Light");
+    Hue.revealSelectedLights([] () { LedControl::fadeForMillis(10000, 10); });
 }
 
 /***** Public methods section *****/
@@ -43,12 +42,10 @@ void setupHue() {
 void setup() {
     Bridge.begin();
     
-    SerialLogWriter sLog;
-    FileLogWriter fLog;
-    TwoLogWriters tLogs = TwoLogWriters(fLog, sLog);
-    logger.registerLogWriter(tLogs);
+    Logger.registerLogWriter(tLog);
+    Logger.setLogLevel(LOG_LEVEL_DEBUG);
     
-    logger.info("Started");
+    Logger.info("Started");
     
     // Do the hue setup
     setupHue();
@@ -56,4 +53,10 @@ void setup() {
 
 void loop() {
     LedControl::fadeForMillis(5000, 5);
+    
+    Logger.info("Doing hue cycle");
+    Hue.storeLightState(1);
+    Hue.setLightState(1, true, 254, 0, 254); // Full brightness red light
+    delay(10000);
+    Hue.restoreLightState(1);
 }

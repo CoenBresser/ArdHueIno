@@ -35,24 +35,19 @@
 
 
 #include <Process.h>
-#include "Logger.h"
 
 typedef String (*WebCallbackType)(Stream&);
 typedef void (*WebErrorCallbackType)(Stream&, int);
 
-class HueWebCalls {
+class WebCalls_ {
 public:
-    HueWebCalls() : started(true) { }
+    WebCalls_() { }
     
-    String doGet(String url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    String doPut(String url, String data, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    String doPost(String url, String data, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    String doDelete(String url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    
-private:
-    boolean started;
-    Logger logger;
-    
+    String doGet(String& url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
+    String doPut(String& url, String& data, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
+    String doPost(String& url, String& data, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
+    String doDelete(String& url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
 };
+extern WebCalls_ WebCalls;
 
 #endif /* defined(__BabyHue__HueWebCalls__) */

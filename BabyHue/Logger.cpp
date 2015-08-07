@@ -8,19 +8,19 @@
 
 #include "Logger.h"
 
-void Logger::setLogLevel(LogLevel level) {
+void Logger_::setLogLevel(int level) {
     logLevel = level;
 }
 
-Logger::LogLevel Logger::getLogLevel() {
+int Logger_::getLogLevel() {
     return logLevel;
 }
 
-void Logger::dumpStream(Stream &s, LogLevel level) {
+void Logger_::dumpStream(Stream &s, int level) {
     if (!logWriter) {
         return;
     }
-    if (logLevel <= level && Serial) {
+    if (logLevel >= level && Serial) {
         logWriter->write("DMP - ");
         while (s.available()) {
             char c = s.read();
@@ -33,56 +33,58 @@ void Logger::dumpStream(Stream &s, LogLevel level) {
     }
 }
 
-void Logger::trace(String trace) {
+void Logger_::trace(String trace) {
     if (!logWriter) {
         return;
     }
-    if (logLevel <= Trace && Serial) {
+    if (logLevel >= LOG_LEVEL_TRACE && Serial) {
         logWriter->writeln("TRC - " + trace);
         logWriter->flush();
     }
 }
 
-void Logger::debug(String debug) {
+void Logger_::debug(String debug) {
     if (!logWriter) {
         return;
     }
-    if (logLevel <= Debug && Serial) {
+    if (logLevel >= LOG_LEVEL_DEBUG && Serial) {
         logWriter->writeln("DBG - " + debug);
         logWriter->flush();
     }
 }
 
-void Logger::info(String info) {
+void Logger_::info(String info) {
     if (!logWriter) {
         return;
     }
-    if (logLevel <= Info && Serial) {
+    if (logLevel >= LOG_LEVEL_INFO && Serial) {
         logWriter->writeln("INF - " + info);
         logWriter->flush();
     }
 }
 
-void Logger::error(String error) {
+void Logger_::error(String error) {
     if (!logWriter) {
         return;
     }
-    if (logLevel <= Error && Serial) {
+    if (logLevel >= LOG_LEVEL_ERROR && Serial) {
         logWriter->writeln("ERR - " + error);
         logWriter->flush();
     }
 }
 
-void Logger::fail(String fail) {
+void Logger_::fail(String fail) {
     if (!logWriter) {
         return;
     }
-    if (logLevel <= Fail && Serial) {
+    if (logLevel >= LOG_LEVEL_FAIL && Serial) {
         logWriter->writeln("FAIL! - " + fail);
         logWriter->flush();
     }
 }
 
-void Logger::registerLogWriter(iLogWriter& writer) {
+void Logger_::registerLogWriter(iLogWriter& writer) {
     logWriter = &writer;
 }
+
+Logger_ Logger;

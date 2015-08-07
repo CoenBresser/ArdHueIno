@@ -1,15 +1,15 @@
 //
-//  HueWebCalls.cpp
-//  BabyHue
+//  WebCalls.cpp
 //
 //  Created by Coen Bresser on 30/07/15.
 //  Copyright (c) 2015 Coen Bresser. All rights reserved.
 //
 
-#include "HueWebCalls.h"
+#include "WebCalls.h"
+#include "Logger.h"
 
-String HueWebCalls::doGet(String url, WebCallbackType callback, WebErrorCallbackType errorCallback) {
-    logger.trace("Execute GET on: " + url);
+String WebCalls_::doGet(String& url, WebCallbackType callback, WebErrorCallbackType errorCallback) {
+    Logger.trace("Execute GET on: " + url);
     Process p;
     p.begin("curl");
     p.addParameter("-L");
@@ -35,8 +35,8 @@ String HueWebCalls::doGet(String url, WebCallbackType callback, WebErrorCallback
     return t;
 }
 
-String HueWebCalls::doPut(String url, String data, WebCallbackType callback, WebErrorCallbackType errorCallback) {
-    logger.trace("Execute PUT on: " + url + ", with data: " + data);
+String WebCalls_::doPut(String& url, String& data, WebCallbackType callback, WebErrorCallbackType errorCallback) {
+    Logger.trace("Execute PUT on: " + url + ", with data: " + data);
     Process p;
     p.begin("curl");
     p.addParameter("-H");
@@ -66,8 +66,8 @@ String HueWebCalls::doPut(String url, String data, WebCallbackType callback, Web
     return t;
 }
 
-String HueWebCalls::doPost(String url, String data, WebCallbackType callback, WebErrorCallbackType errorCallback) {
-    Serial.println("Execute POST on: " + url + ", with data: " + data);
+String WebCalls_::doPost(String& url, String& data, WebCallbackType callback, WebErrorCallbackType errorCallback) {
+    Logger.trace("Execute POST on: " + url + ", with data: " + data);
     Process p;
     p.begin("curl");
     p.addParameter("-H");
@@ -97,4 +97,6 @@ String HueWebCalls::doPost(String url, String data, WebCallbackType callback, We
     return t;
 }
 
-//TODO: Delete
+//TODO: write the doDelete method
+
+WebCalls_ WebCalls;

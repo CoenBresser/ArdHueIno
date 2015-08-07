@@ -17,7 +17,6 @@ public:
     // The default is in the Yun RAM!!
     FileLogWriter(const char *fileName = "/tmp/arduino-log.txt") : logFileName(fileName) {
         FileSystem.begin();
-        writeln("\r\n\r\n---- Started ----");
     };
     
     size_t write(const char str[]);
