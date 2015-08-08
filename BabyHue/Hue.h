@@ -22,9 +22,11 @@ public:
     
     void storeLightState(int lightId);
     void restoreLightState(int lightId);
+    void storeLightStates();
+    void restoreLightStates();
     
     void setLightState(int lightId, bool on, int brightness, int hue, int saturation);
-    void setLightState(int lightId, String on, String brightness, String hue, String saturation);
+    void setLightStates(bool on, int brightness, int hue, int saturation);
     
     void revealSelectedLights(void (*waitFunction)(void) = NULL);
     
@@ -35,15 +37,19 @@ private:
     String hueser;
     
     String getHueRL();
-    String doGetValidateHueser();
+    String doGetValidateHueser(void (*waitFunction)(void) = NULL);
     
     String buildLightsBaseUrl();
     String buildLightStatePutUrl(int id);
     String buildLightGetUrl(int id);
     
     String doGetLightsConfig();
-    String doNewUserRegistration();
+    String doNewUserRegistration(void (*waitFunction)(void) = NULL);
+    
+    void checkCreateHueGroup();
 
+    void setLightState(int lightId, String& on, String& brightness, String& hue, String& saturation);
+    void setLightStates(String& on, String& brightness, String& hue, String& saturation);
 };
 
 extern Hue_ Hue;

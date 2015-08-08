@@ -63,6 +63,16 @@ void Logger_::info(String info) {
     }
 }
 
+void Logger_::warn(String warn) {
+    if (!logWriter) {
+        return;
+    }
+    if (logLevel >= LOG_LEVEL_WARN && Serial) {
+        logWriter->writeln("WRN - " + warn);
+        logWriter->flush();
+    }
+}
+
 void Logger_::error(String error) {
     if (!logWriter) {
         return;

@@ -23,9 +23,11 @@ public:
     virtual void flush() = 0;
 };
 
-#define LOG_LEVEL_TRACE 5
-#define LOG_LEVEL_DEBUG 4
-#define LOG_LEVEL_INFO 3
+#define LOG_LEVEL_DUMP 7
+#define LOG_LEVEL_TRACE 6
+#define LOG_LEVEL_DEBUG 5
+#define LOG_LEVEL_INFO 4
+#define LOG_LEVEL_WARN 3
 #define LOG_LEVEL_ERROR 2
 #define LOG_LEVEL_FAIL 1
 #define LOG_LEVEL_NONE 0
@@ -46,6 +48,7 @@ public:
     void trace(String trace);
     void debug(String debug);
     void info(String info);
+    void warn(String warn);
     void error(String error);
     void fail(String fail);
     
@@ -53,6 +56,7 @@ public:
     int getLogLevel();
     
     // Method to register a log writers. There is room for 2 at the moment
+    // TODO: convert to stream
     void registerLogWriter(iLogWriter& writer);
     
 private:

@@ -9,23 +9,36 @@
 #include <Bridge.h>
 #include "Hue.h"
 #include "WebCalls.h"
-#include "LedControl.h"
 #include "Logger.h"
 #include <EEPROM.h>
 
 Process p;
 
 // Struct to hold the settings
-struct Config {
+struct HueConfig {
     char userName[33];
     int lightIds[10];
 };
-Config config = {
+HueConfig hueConfig = {
     "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
     {1 /* Color Light */, 3 /* Trap omhoog */, 4 /* Grote barbapappa */, 0, 0, 0, 0, 0, 0, 0}
 };
 
 void Hue_::begin(void (*waitFunction)(void)) {
+    
+    // Get the config from the EEPROM
+    EEPROM.get(eepromBaseAddress, hueConfig);
+
+    if (hueConfig.lightIds[0] == 0) {
+        Logger.warn("Updating config");
+        hueConfig.lightIds[0] = 1;
+        hueConfig.lightIds[1] = 3;
+        hueConfig.lightIds[2] = 4;
+        EEPROM.put(eepromBaseAddress, hueConfig);
+    }
+    
+    
+    //
     while (hueRL == "") {
         hueRL = getHueRL();
         if (hueRL == "") {
@@ -39,13 +52,19 @@ void Hue_::begin(void (*waitFunction)(void)) {
     
     Logger.info("Using Hue on: " + hueRL);
     
-    String hueser = doGetValidateHueser();
+    String hueser = doGetValidateHueser(waitFunction);
     Logger.info("Using username: " + hueser);
     
     if (hueser == "") {
         return;
     }
 
+    Logger.info("Checking group config");
+    checkCreateHueGroup();
+}
+
+Hue_::checkCreateHueGroup() {
+    
 }
 
 String parseHueLocationAnswer(Process p) {
@@ -84,7 +103,8 @@ int parseError(Stream& p) {
         if (subpart == "description") {
             // Skip the colon - ": "
             p.readStringUntil('"');
-            Logger.error(p.readStringUntil('"'));
+            String s = p.readStringUntil('"');
+            Logger.error(s);
         }
     }
     return returnCode;
@@ -171,7 +191,8 @@ String parseUserCreateResponse(Stream& p) {
         if (!isValid && subpart == "description") {
             // Skip the colon - ": "
             p.readStringUntil('"');
-            Logger.error(p.readStringUntil('"'));
+            String s = p.readStringUntil('"');
+            Logger.error(s);
         }
         if (subpart == "success") {
             isValid = true;
@@ -191,13 +212,18 @@ String parseUserCreateResponse(Stream& p) {
  *
  * Note that this method doesn't exit until there is a registered user
  */
-String Hue_::doNewUserRegistration() {
+String Hue_::doNewUserRegistration(void (*waitFunction)(void)) {
     while (true) {
         String data = "{\"devicetype\":\"Arduino#BabyHue\"}";
         String response = WebCalls.doPost(hueRL, data, parseUserCreateResponse);
         
         if (response.startsWith("error") || response == "") {
-            LedControl::fadeForMillis(2000, 10);
+            if (waitFunction) {
+                waitFunction();
+            } else {
+                Logger.warn("Press the Hue button for user registration.");
+                delay(5000);
+            }
             continue;
         }
         
@@ -209,25 +235,22 @@ String Hue_::doNewUserRegistration() {
     return "";
 }
 
-String Hue_::doGetValidateHueser() {
+String Hue_::doGetValidateHueser(void (*waitFunction)(void)) {
     /*
      16 byte hex / 32 nibble hex, just take it as a string
      the 33'rd char holds 0 for the string terminator
      char userName[33] = "27787d893751a7726400ccd3c6db19b";
      */
     
-    // Get the user from the EEPROM
-    EEPROM.get(eepromBaseAddress, config);
-    
     // Check if we have a valid user by probing the first character and testing it on the Hue
-    if (config.userName[0] > 0) {
+    if (hueConfig.userName[0] > 0) {
         
-        hueser = String(config.userName);
+        hueser = String(hueConfig.userName);
         String resp = doGetLightsConfig();
         
         // Everything else means there is a problem and we need a new user
         if (resp == "success") {
-            return config.userName;
+            return hueConfig.userName;
         }
     }
     
@@ -235,15 +258,15 @@ String Hue_::doGetValidateHueser() {
     
     
     // This method blocks until we have a user or an insolvable error
-    String newHueser = doNewUserRegistration();
+    String newHueser = doNewUserRegistration(waitFunction);
     if (newHueser == "") {
         return "";
     }
     
     Logger.info("Registered new user: " + newHueser);
     
-    newHueser.toCharArray(config.userName, sizeof(config.userName));
-    EEPROM.put(eepromBaseAddress, config);
+    newHueser.toCharArray(hueConfig.userName, sizeof(hueConfig.userName));
+    EEPROM.put(eepromBaseAddress, hueConfig);
     
     // Get the lights configuration. If it fails there's nothing to do anymore
     if (doGetLightsConfig() != "success") {
@@ -251,11 +274,11 @@ String Hue_::doGetValidateHueser() {
     }
     
     // All done
-    return String(config.userName);
+    return String(hueConfig.userName);
 }
 
 String dumpResponseCallback(Stream& p) {
-    Logger.dumpStream(p, LOG_LEVEL_TRACE);
+    Logger.dumpStream(p, LOG_LEVEL_DUMP);
     return "";
 }
 
@@ -323,10 +346,10 @@ void Hue_::storeLightState(int lightId) {
     Bridge.put("Light" + String(lightId) + "State", state);
 }
 
-void Hue_::setLightState(int lightId, String on, String brightness, String hue, String saturation) {
-    String url = buildLightStatePutUrl(lightId);
-    String data = "{\"on\": " + on + ", \"bri\": " + brightness + ", \"hue\": " + hue + ", \"sat\": " + saturation + "}";
-    WebCalls.doPut(url, data, dumpResponseCallback);
+void Hue_::storeLightStates() {
+    for (int i = 0; i < sizeof(hueConfig.lightIds) && hueConfig.lightIds[i] > 0; i++) {
+        storeLightState(hueConfig.lightIds[i]);
+    }
 }
 
 String getValueFromState(String state, String part) {
@@ -336,33 +359,67 @@ String getValueFromState(String state, String part) {
 
 void Hue_::restoreLightState(int lightId) {
     char bridgeState[35]; // max length possible
-    Bridge.get("Light1State", bridgeState, sizeof(bridgeState));
+    
+    String key = "Light" + String(lightId) + "State";
+    Bridge.get(key.c_str(), bridgeState, sizeof(bridgeState));
+    
     String bs = String(bridgeState);
+    Logger.debug("Restoring Bridge state: " + bs);
     
-    Logger.debug("Retrieved Bridge state: " + bs);
+    String onS = getValueFromState(bs, "on");
+    String briS = getValueFromState(bs, "bri");
+    String hueS = getValueFromState(bs, "hue");
+    String satS = getValueFromState(bs, "sat");
     
-    String on = getValueFromState(bs, "on");
-    String bri = getValueFromState(bs, "bri");
-    String hue = getValueFromState(bs, "hue");
-    String sat = getValueFromState(bs, "sat");
-    
-    setLightState(lightId, on, bri, hue, sat);
+    setLightState(lightId, onS, briS, hueS, satS);
+}
+
+void Hue_::restoreLightStates() {
+    for (int i = 0; i < sizeof(hueConfig.lightIds) && hueConfig.lightIds[i] > 0; i++) {
+        restoreLightState(hueConfig.lightIds[i]);
+    }
 }
 
 void Hue_::setLightState(int lightId, bool on, int brightness, int hue, int saturation) {
-    setLightState(lightId, on ? "true" : "false", String(brightness), String(hue), String(saturation));
+    String onS = on ? "true" : "false";
+    String briS = String(brightness);
+    String hueS = String(hue);
+    String satS = String(saturation);
+    
+    setLightState(lightId, onS, briS, hueS, satS);
+}
+
+// TODO: Fix that setting hue, brightness & saturation is performed when the light is on
+// (set to off is the last action, set to on the first)
+void Hue_::setLightState(int lightId, String& on, String& brightness, String& hue, String& saturation) {
+    String url = buildLightStatePutUrl(lightId);
+    String data = "{\"on\": " + on + ", \"bri\": " + brightness + ", \"hue\": " + hue + ", \"sat\": " + saturation + "}";
+    WebCalls.doPut(url, data, dumpResponseCallback);
+}
+
+void Hue_::setLightStates(bool on, int brightness, int hue, int saturation) {
+    for (int i = 0; i < sizeof(hueConfig.lightIds) && hueConfig.lightIds[i] > 0; i++) {
+        setLightState(hueConfig.lightIds[i], on, brightness, hue, saturation);
+    }
 }
 
 void Hue_::revealSelectedLights(void (*waitFunction)(void)) {
     bool once = (waitFunction == NULL);
     
-    enableAlert(1, once);
+    for (int i = 0; i < sizeof(hueConfig.lightIds) && hueConfig.lightIds[i] > 0; i++) {
+        enableAlert(hueConfig.lightIds[i], once);
+    }
+    
     if (!once) {
         waitFunction();
-        disableAlert(1);
+        for (int i = 0; i < sizeof(hueConfig.lightIds) && hueConfig.lightIds[i] > 0; i++) {
+            disableAlert(hueConfig.lightIds[i]);
+        }
     }
 }
 
+// TODO: groups interaction with group BabyHue i.o. individual lights:
+// {"lights":["1","3","4"],"name":"BabyHue"}
+// {"on": false,"hue": 0,"bri": 255,"sat": 255}
+
 Hue_ Hue;
-
-

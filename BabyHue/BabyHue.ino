@@ -17,7 +17,7 @@
 #include "TwoLogWriters.h"
 #include "Hue.h"
 #include "LedControl.h"
-
+#include <Console.h>
 // For some reason passing this as a parameter results in not being able to read the stream...
 SerialLogWriter sLog;
 FileLogWriter fLog;
@@ -52,11 +52,14 @@ void setup() {
 }
 
 void loop() {
-    LedControl::fadeForMillis(5000, 5);
+    Logger.info("Restarting hue cycle");
     
-    Logger.info("Doing hue cycle");
-    Hue.storeLightState(1);
-    Hue.setLightState(1, true, 254, 0, 254); // Full brightness red light
+    Logger.info("Wait for 10 seconds");
+    LedControl::fadeForMillis(10000, 5);
+    
+    Logger.info("Set and reset");
+    Hue.storeLightStates();
+    Hue.setLightStates(true, 254, 0, 254); // Full brightness red
     delay(10000);
-    Hue.restoreLightState(1);
+    Hue.restoreLightStates();
 }
