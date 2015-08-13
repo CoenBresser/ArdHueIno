@@ -214,7 +214,10 @@
 		205F38D51B70D88F002C7F1A /* TwoLogWriters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoLogWriters.h; sourceTree = "<group>"; };
 		205F38D71B70DADA002C7F1A /* FileLogWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileLogWriter.cpp; sourceTree = "<group>"; };
 		205F38D81B70DADA002C7F1A /* FileLogWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileLogWriter.h; sourceTree = "<group>"; };
-		20B7EBC91B7C7D780050CD78 /* GetIpAddress.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = GetIpAddress.sh; sourceTree = "<group>"; };
+		20B7EBC91B7C7D780050CD78 /* GetApiAddress.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = GetApiAddress.sh; sourceTree = "<group>"; };
+		20B7EBCB1B7C82300050CD78 /* hueUsername */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hueUsername; sourceTree = "<group>"; };
+		20B7EBCC1B7CC4340050CD78 /* Yun preparations */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Yun preparations"; sourceTree = "<group>"; };
+		20B7EBCD1B7CCBAB0050CD78 /* UploadScripts.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = UploadScripts.sh; sourceTree = "<group>"; };
 		AAAA150730090325AA000006 /* abi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = abi.cpp; sourceTree = "<group>"; };
 		AAAA150730090325AA000007 /* Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arduino.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000008 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary.h; sourceTree = "<group>"; };
@@ -486,7 +489,10 @@
 		20B7EBCA1B7C81640050CD78 /* Yun scripts */ = {
 			isa = PBXGroup;
 			children = (
-				20B7EBC91B7C7D780050CD78 /* GetIpAddress.sh */,
+				20B7EBC91B7C7D780050CD78 /* GetApiAddress.sh */,
+				20B7EBCB1B7C82300050CD78 /* hueUsername */,
+				20B7EBCC1B7CC4340050CD78 /* Yun preparations */,
+				20B7EBCD1B7CCBAB0050CD78 /* UploadScripts.sh */,
 			);
 			name = "Yun scripts";
 			sourceTree = "<group>";

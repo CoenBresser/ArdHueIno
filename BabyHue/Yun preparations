@@ -1,0 +1,7 @@
+Install SFTP server for moving scripts to the Yun:
+opkg update
+opkg install openssh-sftp-server
+reboot
+
+
+

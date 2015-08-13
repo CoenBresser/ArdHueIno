@@ -26,9 +26,19 @@ HueConfig hueConfig = {
     "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 };
 
+Process _hueP;
+
 void Hue_::begin(void (*waitFunction)(void)) {
     
+    _hueP.begin("./usr/etc/GetIpAddress.sh");
+    _hueP.run();
+    while (_hueP.running()) {
+        waitFunction();
+    }
+    Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG);
+    
     // Get the config from the EEPROM
+    /*
     EEPROM.get(eepromBaseAddress, hueConfig);
     
     while (strlen(hueRL) == 0) {
@@ -53,6 +63,7 @@ void Hue_::begin(void (*waitFunction)(void)) {
 
     Logger.info("Checking group config");
     checkCreateHueGroup(waitFunction);
+     */
 }
 
 /************************************** Builders *************************************/
