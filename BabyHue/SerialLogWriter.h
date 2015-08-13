@@ -20,6 +20,7 @@ public:
     size_t writeln(const char c[]);
     size_t writeln(const String &s);
     void flush();
+    void wait();
 };
 
 #endif /* defined(__BabyHue__SerialLogWriter__) */

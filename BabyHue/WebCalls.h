@@ -12,28 +12,6 @@
 #ifndef __BabyHue__HueWebCalls__
 #define __BabyHue__HueWebCalls__
 
-/* Examples
- String cbk(Process p) {
-     Serial.println("In callback");
-     while (p.available()) {
-         char c = p.read();
-         Serial.print(c);
-     }
-     return "success";
- }
- 
- void go() {
-     String error = "";
-     if (w.doGet(url, cbk) == "") {
-         return error;
-     };
-     if (error = w.doGet(url, [](Process p) -> String {return 1;})) {
-         return "";
-     };
- }
-*/
-
-
 #include <Process.h>
 
 typedef String (*WebCallbackType)(Stream&);
@@ -43,10 +21,13 @@ class WebCalls_ {
 public:
     WebCalls_() { }
     
-    String doGet(String& url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    String doPut(String& url, String& data, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    String doPost(String& url, String& data, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
-    String doDelete(String& url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
+    String doGet(const char *url, WebCallbackType callback, WebErrorCallbackType errorCallback = NULL);
+    String doPut(const char *url, const char *data, WebCallbackType callback = NULL, WebErrorCallbackType errorCallback = NULL);
+    String doPost(const char *url, const char *data, WebCallbackType callback = NULL, WebErrorCallbackType errorCallback = NULL);
+    String doDelete(const char *url, WebCallbackType callback = NULL, WebErrorCallbackType errorCallback = NULL);
+    
+private:
+    Process _p;
 };
 extern WebCalls_ WebCalls;
 

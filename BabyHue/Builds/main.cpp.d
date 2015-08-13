@@ -19,6 +19,4 @@ Builds/main.cpp.o: main.cpp \
  /Applications/Arduino.app/Contents/Java/libraries/Bridge/src/Console.h \
  /Applications/Arduino.app/Contents/Java/libraries/Bridge/src/Process.h \
  /Applications/Arduino.app/Contents/Java/hardware/arduino/avr/libraries/EEPROM/EEPROM.h \
- Logger.h SerialLogWriter.h FileLogWriter.h \
- /Applications/Arduino.app/Contents/Java/libraries/Bridge/src/FileIO.h \
- TwoLogWriters.h Hue.h LedControl.h
+ Logger.h SerialLogWriter.h Hue.h LedControl.h

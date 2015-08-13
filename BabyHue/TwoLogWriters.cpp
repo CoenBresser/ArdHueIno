@@ -32,3 +32,8 @@ void TwoLogWriters::flush() {
     first->flush();
     second->flush();
 }
+
+void TwoLogWriters::wait() {
+    first->wait();
+    second->wait();
+}

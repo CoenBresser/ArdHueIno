@@ -21,6 +21,7 @@ public:
     virtual size_t writeln(const char c[]) = 0;
     virtual size_t writeln(const String &s) = 0;
     virtual void flush() = 0;
+    virtual void wait() = 0;
 };
 
 #define LOG_LEVEL_DUMP 7
@@ -45,12 +46,19 @@ public:
     
     void dumpStream(Stream& stream, int logLevel);
     
-    void trace(String trace);
-    void debug(String debug);
-    void info(String info);
-    void warn(String warn);
-    void error(String error);
-    void fail(String fail);
+    void trace(const String& traceMsg);
+    void debug(const String& debugMsg);
+    void info(const String& infoMsg);
+    void warn(const String& warnMsg);
+    void error(const String& errorMsg);
+    void fail(const String& failMsg);
+    
+    void trace(const char *traceMsg, const char *data = NULL);
+    void debug(const char *debugMsg, const char *data = NULL);
+    void info(const char *infoMsg, const char *data = NULL);
+    void warn(const char *warnMsg, const char *data = NULL);
+    void error(const char *errorMsg, const char *data = NULL);
+    void fail(const char *failMsg, const char *data = NULL);
     
     void setLogLevel(int logLevel);
     int getLogLevel();
@@ -63,6 +71,8 @@ private:
     boolean started;
     int logLevel;
     iLogWriter *logWriter;
+    
+    void write(int checkLvl, const char *lvlMsg, const char *msg, const char *data);
 };
 
 extern Logger_ Logger;

@@ -56,3 +56,4 @@ size_t FileLogWriter::writeln(const String &s) {
 }
 
 void FileLogWriter::flush() { }
+void FileLogWriter::wait() { }

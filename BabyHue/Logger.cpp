@@ -20,8 +20,10 @@ void Logger_::dumpStream(Stream &s, int level) {
     if (!logWriter) {
         return;
     }
-    if (logLevel >= level && Serial) {
+    logWriter->wait();
+    if (logLevel >= level) {
         logWriter->write("DMP - ");
+        // TODO: streamline this so it reads chunks i.o. characters
         while (s.available()) {
             char c = s.read();
             logWriter->write(c);
@@ -33,64 +35,66 @@ void Logger_::dumpStream(Stream &s, int level) {
     }
 }
 
-void Logger_::trace(String trace) {
+void Logger_::trace(const String& traceMsg) {
+    trace(traceMsg.c_str());
+}
+
+void Logger_::debug(const String& debugMsg) {
+    debug(debugMsg.c_str());
+}
+
+void Logger_::info(const String& infoMsg) {
+    info(infoMsg.c_str());
+}
+
+void Logger_::warn(const String& warnMsg) {
+    warn(warnMsg.c_str());
+}
+
+void Logger_::error(const String& errorMsg) {
+    error(errorMsg.c_str());
+}
+
+void Logger_::fail(const String& failMsg) {
+    fail(failMsg.c_str());
+}
+
+void Logger_::write(int checkLvl, const char *lvlMsg, const char *msg, const char *data) {
     if (!logWriter) {
         return;
     }
-    if (logLevel >= LOG_LEVEL_TRACE && Serial) {
-        logWriter->writeln("TRC - " + trace);
+    logWriter->wait();
+    if (logLevel >= checkLvl) {
+        logWriter->write(lvlMsg);
+        logWriter->write(msg);
+        if (data) logWriter->write(data);
+        logWriter->writeln("");
         logWriter->flush();
     }
 }
 
-void Logger_::debug(String debug) {
-    if (!logWriter) {
-        return;
-    }
-    if (logLevel >= LOG_LEVEL_DEBUG && Serial) {
-        logWriter->writeln("DBG - " + debug);
-        logWriter->flush();
-    }
+void Logger_::trace(const char *traceMsg, const char *data) {
+    write(LOG_LEVEL_TRACE, "TRC - ", traceMsg, data);
 }
 
-void Logger_::info(String info) {
-    if (!logWriter) {
-        return;
-    }
-    if (logLevel >= LOG_LEVEL_INFO && Serial) {
-        logWriter->writeln("INF - " + info);
-        logWriter->flush();
-    }
+void Logger_::debug(const char *debugMsg, const char *data) {
+    write(LOG_LEVEL_DEBUG, "DBG - ", debugMsg, data);
 }
 
-void Logger_::warn(String warn) {
-    if (!logWriter) {
-        return;
-    }
-    if (logLevel >= LOG_LEVEL_WARN && Serial) {
-        logWriter->writeln("WRN - " + warn);
-        logWriter->flush();
-    }
+void Logger_::info(const char *infoMsg, const char *data) {
+    write(LOG_LEVEL_INFO, "INF - ", infoMsg, data);
 }
 
-void Logger_::error(String error) {
-    if (!logWriter) {
-        return;
-    }
-    if (logLevel >= LOG_LEVEL_ERROR && Serial) {
-        logWriter->writeln("ERR - " + error);
-        logWriter->flush();
-    }
+void Logger_::warn(const char *warnMsg, const char *data) {
+    write(LOG_LEVEL_WARN, "WRN - ", warnMsg, data);
 }
 
-void Logger_::fail(String fail) {
-    if (!logWriter) {
-        return;
-    }
-    if (logLevel >= LOG_LEVEL_FAIL && Serial) {
-        logWriter->writeln("FAIL! - " + fail);
-        logWriter->flush();
-    }
+void Logger_::error(const char *errorMsg, const char *data) {
+    write(LOG_LEVEL_ERROR, "ERR - ", errorMsg, data);
+}
+
+void Logger_::fail(const char *failMsg, const char *data) {
+    write(LOG_LEVEL_FAIL, "FAIL! - ", failMsg, data);
 }
 
 void Logger_::registerLogWriter(iLogWriter& writer) {

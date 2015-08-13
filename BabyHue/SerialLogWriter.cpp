@@ -57,3 +57,7 @@ void SerialLogWriter::flush() {
         Serial.flush();
     }
 }
+
+void SerialLogWriter::wait() {
+    while (Serial._rx_buffer_head != Serial._rx_buffer_tail) delay(10);
+}

@@ -5,11 +5,15 @@
 //  Created by Coen Bresser on 04/08/15.
 //  Copyright (c) 2015 Coen Bresser. All rights reserved.
 //
+// Warning! Due to the amount of memory used this class uses some globals
+//  making it not safe for concurrent access
 
 #ifndef __BabyHue__Hue__
 #define __BabyHue__Hue__
 
 #include "Logger.h"
+
+#define MAX_HUE_GROUP_MEMBERS 8
 
 class Hue_ {
 public:
@@ -33,23 +37,25 @@ public:
 private:
     int eepromBaseAddress;
     
-    String hueRL;
-    String hueser;
+    char hueRL[27]; // e.g. http://192.168.255.255/api/
+    char hueser[33]; // e.g. 27787d893751a7726400ccd3c6db19b
+    int lightIds[MAX_HUE_GROUP_MEMBERS];
     
-    String getHueRL();
-    String doGetValidateHueser(void (*waitFunction)(void) = NULL);
+    void getHueRL();
+    void doGetValidateHueser(void (*waitFunction)(void) = NULL);
     
-    String buildLightsBaseUrl();
-    String buildLightStatePutUrl(int id);
-    String buildLightGetUrl(int id);
+    const char* buildLightsBaseUrl();
+    const char* buildLightStatePutUrl(int id);
+    const char* buildLightGetUrl(int id);
+    const char* buildGroupsBaseUrl();
+    const char* buildGroupActionUrl();
+    const char* buildGroupUrl();
     
     String doGetLightsConfig();
     String doNewUserRegistration(void (*waitFunction)(void) = NULL);
     
-    void checkCreateHueGroup();
-
-    void setLightState(int lightId, String& on, String& brightness, String& hue, String& saturation);
-    void setLightStates(String& on, String& brightness, String& hue, String& saturation);
+    void checkCreateHueGroup(void (*waitFunction)(void) = NULL);
+    void getLightIdsFromGroup();
 };
 
 extern Hue_ Hue;
