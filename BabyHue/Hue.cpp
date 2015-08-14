@@ -414,53 +414,37 @@ String parseHueGroupForId(Stream& s) {
 
 /************************************** Store/restore ********************************/
 
-void Hue_::storeLightState(int lightId) {
-    const char *url = buildLightGetUrl(lightId);
-    String state = WebCalls.doGet(url, parseLightState);
-    
-    String key = "Light" + String(lightId) + "State";
-    Logger.trace("Storing state in Bridge");
-    Logger.trace(key.c_str(),state.c_str());
-    
-    Bridge.put(key.c_str(), state);
-}
-
 void Hue_::storeLightStates() {
-    getLightIdsFromGroup();
+    Logger.info("Storing light states");
     
-    for (int i = 0; i < MAX_HUE_GROUP_MEMBERS && lightIds[i] > 0; i++) {
-        storeLightState(lightIds[i]);
+    Process _hueP;
+    _hueP.begin("/usr/BabyHue/./doStoreGroupLightsState.sh");
+    _hueP.runAsynchronously();
+    while (_hueP.running()) {
+        delay(100);
     }
-}
-
-String getValueFromState(const String state, String part) {
-    int idx = state.indexOf(part);
-    return state.substring(state.indexOf(':', idx) + 1, state.indexOf(',', idx));
-}
-
-void Hue_::restoreLightState(int lightId) {
-    char bridgeState[35]; // max length possible
     
-    String key = "Light" + String(lightId) + "State";
-    Bridge.get(key.c_str(), bridgeState, sizeof(bridgeState));
+    // Ignore response in this script
+    //Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG);
     
-    Logger.trace("Restoring state from Bridge");
-    Logger.trace(key.c_str(),bridgeState);
-    
-    bool on = getValueFromState(bridgeState, "on") == "true";
-    int bri = getValueFromState(bridgeState, "bri").toInt();
-    int hue = getValueFromState(bridgeState, "hue").toInt();
-    int sat = getValueFromState(bridgeState, "sat").toInt();
-    
-    setLightState(lightId, on, bri, hue, sat);
+    _hueP.flush();
+    _hueP.close();
 }
 
 void Hue_::restoreLightStates() {
-    // Note: use the previous list of light Id's
+    Logger.info("Restoring light states");
     
-    for (int i = 0; i < MAX_HUE_GROUP_MEMBERS && lightIds[i] > 0; i++) {
-        restoreLightState(lightIds[i]);
+    Process _hueP;
+    _hueP.begin("/usr/BabyHue/./doRestoreGroupLightsState.sh");
+    _hueP.runAsynchronously();
+    while (_hueP.running()) {
+        delay(100);
     }
+    // Ignore response in this script
+    //Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG);
+    
+    _hueP.flush();
+    _hueP.close();
 }
 
 /************************************** Ungrouped ************************************/

@@ -42,18 +42,21 @@ void setup() {
     // Enable alert on the light called "Color Light"
     Hue.revealSelectedLights([] () { LedControl::fadeForMillis(5000, 10); });
 
-    /*
+
     // ******** Perform test ******** //
     Logger.info("Store states");
     Hue.storeLightStates();
-    
+/*
     Logger.info("Set to red");
     Hue.setLightStates(true, 254, 0, 254); // Full brightness red
+    */
     
-    delay(10000);
+    
+    LedControl::fadeForMillis(10000, 50);
+    
     Logger.info("Restore states");
     Hue.restoreLightStates();
-    */
+ 
 }
 
 void loop() {
