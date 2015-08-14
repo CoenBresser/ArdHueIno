@@ -3,5 +3,8 @@ opkg update
 opkg install openssh-sftp-server
 reboot
 
+Upload the scripts
+
+
 
 

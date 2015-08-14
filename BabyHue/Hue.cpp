@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Coen Bresser. All rights reserved.
 //
 
+//TODO: Rewrite to asynchrounous
+
 #include <Bridge.h>
 #include "Hue.h"
 #include "WebCalls.h"
@@ -26,19 +28,20 @@ HueConfig hueConfig = {
     "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 };
 
-Process _hueP;
-
 void Hue_::begin(void (*waitFunction)(void)) {
     
-    _hueP.begin("./usr/etc/GetIpAddress.sh");
-    _hueP.run();
-    while (_hueP.running()) {
-        waitFunction();
-    }
-    Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG);
+    Logger.info("Setting up Hue on Yun");
     
-    // Get the config from the EEPROM
+    Process _hueP;
+    _hueP.begin("/usr/BabyHue/./doStartYunHue.sh");
+    int returnCode = _hueP.run();
+    Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG); // Do something with the received OK
+    _hueP.flush();
+    _hueP.close();
+
+    
     /*
+    // Get the config from the EEPROM
     EEPROM.get(eepromBaseAddress, hueConfig);
     
     while (strlen(hueRL) == 0) {

@@ -28,7 +28,7 @@ void Logger_::dumpStream(Stream &s, int level) {
             char c = s.read();
             logWriter->write(c);
         }
-        logWriter->writeln("");
+        logWriter->writeln(" - END");
         logWriter->flush();
     } else {
         s.flush();

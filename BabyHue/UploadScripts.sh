@@ -6,6 +6,6 @@
 #  Created by Coen Bresser on 13/08/15.
 #  Copyright (c) 2015 Coen Bresser. All rights reserved.
 
-#sftp root@10.0.0.1:/path/to/file.txt localfile.txt
-sshpass -p arduino sftp root@arduino.local:/usr/BabyHue/GetApiAddress.sh GetApiAddress.sh
-sshpass -p arduino sftp root@arduino.local:/usr/BabyHue/hueUsername hueUsername
+#scp root@10.0.0.1:/path/to/file.txt localfile.txt
+sshpass -p arduino scp root@arduino.local:/usr/etc/GetApiAddress.sh GetApiAddress.sh
+sshpass -p arduino scp root@arduino.local:/usr/etc/hueUsername hueUsername

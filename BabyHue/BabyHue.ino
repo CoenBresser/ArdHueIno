@@ -38,10 +38,11 @@ void setup() {
     // We have a valid Hue configuration now
     Logger.info("Notifying we're there");
     
-    /*
+    
     // Enable alert on the light called "Color Light"
-    Hue.revealSelectedLights([] () { LedControl::fadeForMillis(10000, 10); });
+    //Hue.revealSelectedLights([] () { LedControl::fadeForMillis(10000, 10); });
 
+    /*
     // ******** Perform test ******** //
     Logger.info("Store states");
     Hue.storeLightStates();
