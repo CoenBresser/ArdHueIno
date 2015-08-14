@@ -24,13 +24,14 @@ do
 
     #  Pre process to set "on":true as the first and "on":false as the last element
     if [[ ${STATE:5:5} == "false" ]]; then
-        STATE=${STATE:11}
+        STATE="${STATE:11} \"transitiontime\":0"
         SET_TO_OFF=1
     fi
     LIGHT_URL="$(cat /tmp/hueApiUrl)lights/${LIGHT}/state/"
 
     DATA=$(printf ",%s" $STATE)
     DATA="{${DATA:1}}"
+    echo $DATA
 
     RESULT=$(curl -H "Content-Type: application/json" -X PUT -d $DATA $LIGHT_URL 2>/dev/null)
 

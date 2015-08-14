@@ -13,49 +13,18 @@
 
 #include "Logger.h"
 
-#define MAX_HUE_GROUP_MEMBERS 8
-
 class Hue_ {
 public:
-    Hue_(int eepromBaseAddress = 0) : eepromBaseAddress(eepromBaseAddress) { };
+    Hue_() { };
     
     void begin(void (*waitFunction)(void) = NULL);
     
-    void enableAlert(int lightId, bool once = false);
-    void disableAlert(int lightId);
+    void storeLightStates(void (*waitFunction)(void) = NULL);
+    void restoreLightStates(void (*waitFunction)(void) = NULL);
     
-    void storeLightState(int lightId);
-    void restoreLightState(int lightId);
-    void storeLightStates();
-    void restoreLightStates();
+    void setLightStates(bool on, int brightness, int hue, int saturation, void (*waitFunction)(void) = NULL);
+    void revealSelectedLights(void (*waitFunction)(void) = NULL);    
     
-    void setLightState(int lightId, bool on, int brightness, int hue, int saturation);
-    void setLightStates(bool on, int brightness, int hue, int saturation);
-    
-    void revealSelectedLights(void (*waitFunction)(void) = NULL);
-    
-private:
-    int eepromBaseAddress;
-    
-    char hueRL[27]; // e.g. http://192.168.255.255/api/
-    char hueser[33]; // e.g. 27787d893751a7726400ccd3c6db19b
-    int lightIds[MAX_HUE_GROUP_MEMBERS];
-    
-    void getHueRL();
-    void doGetValidateHueser(void (*waitFunction)(void) = NULL);
-    
-    const char* buildLightsBaseUrl();
-    const char* buildLightStatePutUrl(int id);
-    const char* buildLightGetUrl(int id);
-    const char* buildGroupsBaseUrl();
-    const char* buildGroupActionUrl();
-    const char* buildGroupUrl();
-    
-    String doGetLightsConfig();
-    String doNewUserRegistration(void (*waitFunction)(void) = NULL);
-    
-    void checkCreateHueGroup(void (*waitFunction)(void) = NULL);
-    void getLightIdsFromGroup();
 };
 
 extern Hue_ Hue;

@@ -13,20 +13,20 @@
 
 #include "Logger.h"
 #include "SerialLogWriter.h"
-//#include "FileLogWriter.h"
-//#include "TwoLogWriters.h"
+#include "FileLogWriter.h"
+#include "TwoLogWriters.h"
 #include "Hue.h"
 #include "LedControl.h"
 #include <Console.h>
 
 SerialLogWriter sLog;
-//FileLogWriter fLog;
-//TwoLogWriters tLog = TwoLogWriters(fLog, sLog);
+FileLogWriter fLog;
+TwoLogWriters tLog = TwoLogWriters(fLog, sLog);
 
 void setup() {
     Bridge.begin();
     
-    Logger.registerLogWriter(sLog);
+    Logger.registerLogWriter(tLog);
     Logger.setLogLevel(LOG_LEVEL_DEBUG);
     
     Logger.info("Started");
@@ -46,11 +46,9 @@ void setup() {
     // ******** Perform test ******** //
     Logger.info("Store states");
     Hue.storeLightStates();
-/*
+
     Logger.info("Set to red");
     Hue.setLightStates(true, 254, 0, 254); // Full brightness red
-    */
-    
     
     LedControl::fadeForMillis(10000, 50);
     

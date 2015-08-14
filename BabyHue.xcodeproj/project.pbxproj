@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2025D62A1B5D9503001AFE23 /* LocalLibrary.h in Sources */ = {isa = PBXBuildFile; fileRef = 2035D62A1B5D9503001AFE23 /* LocalLibrary.h */; };
 		2025D6A01B5D9503001AFE23 /* BabyHue.ino in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6A01B5D9503001AFE23 /* BabyHue.ino */; };
-		2026E0DB1B6A4F7A005B6C61 /* WebCalls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2026E0D91B6A4F7A005B6C61 /* WebCalls.cpp */; };
 		2035D6241B5D9503001AFE23 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6231B5D9503001AFE23 /* main.cpp */; };
 		2035D6291B5D9503001AFE23 /* LocalLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2035D6281B5D9503001AFE23 /* LocalLibrary.cpp */; };
 		2056D09A1B7101A600D21BC6 /* Hue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2056D0981B7101A600D21BC6 /* Hue.cpp */; };
@@ -82,8 +81,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2026E0D91B6A4F7A005B6C61 /* WebCalls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebCalls.cpp; sourceTree = "<group>"; };
-		2026E0DA1B6A4F7A005B6C61 /* WebCalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCalls.h; sourceTree = "<group>"; };
 		2035D6201B5D9503001AFE23 /* Index */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Index; sourceTree = BUILT_PRODUCTS_DIR; };
 		2035D6231B5D9503001AFE23 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		2035D6251B5D9503001AFE23 /* Makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -221,6 +218,7 @@
 		20C1C55A1B7CF5C2001FE2FB /* doStoreGroupLightsState.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = doStoreGroupLightsState.sh; sourceTree = "<group>"; };
 		20C1C55B1B7E0302001FE2FB /* doNotifyGroup.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = doNotifyGroup.sh; sourceTree = "<group>"; };
 		20C1C55C1B7E28F8001FE2FB /* doRestoreGroupLightsState.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = doRestoreGroupLightsState.sh; sourceTree = "<group>"; };
+		20C1C55D1B7E46CB001FE2FB /* doSetGroupLightsState.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = doSetGroupLightsState.sh; sourceTree = "<group>"; };
 		AAAA150730090325AA000006 /* abi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = abi.cpp; sourceTree = "<group>"; };
 		AAAA150730090325AA000007 /* Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arduino.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000008 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary.h; sourceTree = "<group>"; };
@@ -317,8 +315,6 @@
 				2035D6781B5D9503001AFE23 /* Makefiles */,
 				2035D6961B5D9503001AFE23 /* About */,
 				2035D6981B5D9503001AFE23 /* Utilities */,
-				2026E0D91B6A4F7A005B6C61 /* WebCalls.cpp */,
-				2026E0DA1B6A4F7A005B6C61 /* WebCalls.h */,
 				2056D0971B70FAB300D21BC6 /* Logging */,
 				205F38CD1B6B9D18002C7F1A /* LedControl.cpp */,
 				205F38CE1B6B9D18002C7F1A /* LedControl.h */,
@@ -499,6 +495,7 @@
 				20B7EBCC1B7CC4340050CD78 /* Yun preparations */,
 				20B7EBCD1B7CCBAB0050CD78 /* UploadScripts.sh */,
 				20C1C55B1B7E0302001FE2FB /* doNotifyGroup.sh */,
+				20C1C55D1B7E46CB001FE2FB /* doSetGroupLightsState.sh */,
 			);
 			name = "Yun scripts";
 			sourceTree = "<group>";
@@ -954,7 +951,6 @@
 				AA2A150730090325AA00003C /* twi.h in Sources */,
 				AA2A150730090325AA00003D /* Wire.cpp in Sources */,
 				AA2A150730090325AA00003E /* Wire.h in Sources */,
-				2026E0DB1B6A4F7A005B6C61 /* WebCalls.cpp in Sources */,
 				205F38CF1B6B9D18002C7F1A /* LedControl.cpp in Sources */,
 				AA2A150730090325AA000041 /* pins_arduino.h in Sources */,
 				AA2A150730090325AA000043 /* pins_arduino.h in Sources */,
