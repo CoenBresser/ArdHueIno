@@ -49,10 +49,10 @@ echo "Getting and checking Hue group"
 GROUPS_URL="$(cat /tmp/hueApiUrl)groups/"
 echo "Groups url: ${GROUPS_URL}"
 
-GROUP_ID=$(curl -L -k ${GROUPS_URL} 2>/dev/null | sed -E 's/.*([0-9]{1,2})\"\:\{\"name\"\:\"BabyHue.*/\1/')
-if [ ${#GROUP_ID} -gt 2 ] || [ ${GROUP_ID} == "{}" ]; then
+GROUP_ID=$(curl -L -k ${GROUPS_URL} 2>/dev/null | egrep -o '[0-9]{1,2}\"\:\{\"name\"\:\"BabyHue' | egrep -o '[0-9]{1,2}')
+if [ ${#GROUP_ID} -eq 0 ]; then
     echo "Creating Hue group"
-    GROUP_ID=$(curl -H "Content-Type: application/json" -X POST -d '{"name":"BabyHue","lights":["1"]}' ${GROUPS_URL} 2>/dev/null | sed -E 's/.*success.*([0-9]{1,2}).*/\1/')
+    GROUP_ID=$(curl -H "Content-Type: application/json" -X POST -d '{"name":"BabyHue","lights":["1"]}' ${GROUPS_URL} 2>/dev/null | egrep -o 'success.*[0-9]{1,2}' | egrep -o '[0-9]{1,2}')
 fi
 
 echo "${GROUPS_URL}${GROUP_ID}/" > /tmp/hueGroupApi
