@@ -11,19 +11,4 @@
 
 # TODO
 
-IP=""
-while [ ${#IP} -le 7 ]
-do
-    IP=$(curl -L -k http://www.meethue.com/api/nupnp 2>/dev/null | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
-    if [ ${#IP} -le 7 ]; then
-        sleep 10s
-    fi
-done
-
-USERNAME=$(cat /usr/BabyHue/hueUsername)
-
-API="http://${IP}/api/${USERNAME}/"
-
-echo "${API}" > /tmp/hueApiUrl
-echo "OK"
 

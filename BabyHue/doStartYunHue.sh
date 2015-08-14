@@ -13,6 +13,9 @@
 
 SCRIPT_LOCATION=$(dirname $0)
 
+#  Get the IP of the Hue
+echo "Getting IP"
+
 IP=""
 while [ ${#IP} -le 7 ]
 do
@@ -22,12 +25,37 @@ do
     fi
 done
 
-#  TODO: check for username and return that to the Arduino
+echo "Using IP: ${IP}"
+
+#  Get and verify the user
+#  TODO: check for username in Hue and user creation
+
+echo "Getting and checking username"
 
 USERNAME=$(cat $SCRIPT_LOCATION/hueUsername)
+
+echo "Using username: ${USERNAME}"
 
 API="http://${IP}/api/${USERNAME}/"
 
 echo "${API}" > /tmp/hueApiUrl
-echo "OK"
 
+echo "API location: ${API}"
+
+#  Get and verify the BabyHue group
+
+echo "Getting and checking Hue group"
+
+GROUPS_URL="$(cat /tmp/hueApiUrl)groups/"
+echo "Groups url: ${GROUPS_URL}"
+
+GROUP_ID=$(curl -L -k ${GROUPS_URL} 2>/dev/null | sed -E 's/.*([0-9]{1,2})\"\:\{\"name\"\:\"BabyHue.*/\1/')
+if [ ${#GROUP_ID} -gt 2 ] || [ ${GROUP_ID} == "{}" ]; then
+    echo "Creating Hue group"
+    GROUP_ID=$(curl -H "Content-Type: application/json" -X POST -d '{"name":"BabyHue","lights":["1"]}' ${GROUPS_URL} 2>/dev/null | sed -E 's/.*success.*([0-9]{1,2}).*/\1/')
+fi
+
+echo "${GROUPS_URL}${GROUP_ID}/" > /tmp/hueGroupApi
+echo "Hue group API: ${GROUPS_URL}${GROUP_ID}/"
+
+echo "DONE"

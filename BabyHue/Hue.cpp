@@ -34,7 +34,15 @@ void Hue_::begin(void (*waitFunction)(void)) {
     
     Process _hueP;
     _hueP.begin("/usr/BabyHue/./doStartYunHue.sh");
-    int returnCode = _hueP.run();
+    _hueP.runAsynchronously();
+    while (_hueP.running()) {
+        // TODO: check if we can receive data while running, this would make things more flexible!
+        if (waitFunction) {
+            waitFunction();
+        } else {
+            delay(100);
+        }
+    }
     Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG); // Do something with the received OK
     _hueP.flush();
     _hueP.close();
@@ -676,15 +684,24 @@ void Hue_::setLightStates(bool on, int brightness, int hue, int saturation) {
 }
 
 void Hue_::revealSelectedLights(void (*waitFunction)(void)) {
-    bool once = (waitFunction == NULL);
+    Logger.info("Revealing lights in group");
     
-    const char *url = buildGroupActionUrl();
-    WebCalls.doPut(url, (once ? "{\"alert\":\"select\"}" : "{\"alert\":\"lselect\"}"), dumpResponseCallback);
-    
-    if (!once) {
-        waitFunction();
-        WebCalls.doPut(url, "{\"alert\":\"none\"}");
+    Process _hueP;
+    _hueP.begin("/usr/BabyHue/./doNotifyGroup.sh");
+    _hueP.runAsynchronously();
+    while (_hueP.running()) {
+        if (waitFunction) {
+            waitFunction();
+        } else {
+            delay(100);
+        }
     }
+    
+    // No response in this script
+    //Logger.dumpStream(_hueP, LOG_LEVEL_DEBUG);
+    
+    _hueP.flush();
+    _hueP.close();
 }
 
 Hue_ Hue;

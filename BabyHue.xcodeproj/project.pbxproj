@@ -218,7 +218,8 @@
 		20B7EBCB1B7C82300050CD78 /* hueUsername */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hueUsername; sourceTree = "<group>"; };
 		20B7EBCC1B7CC4340050CD78 /* Yun preparations */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Yun preparations"; sourceTree = "<group>"; };
 		20B7EBCD1B7CCBAB0050CD78 /* UploadScripts.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = UploadScripts.sh; sourceTree = "<group>"; };
-		20C1C55A1B7CF5C2001FE2FB /* GetGroupLights.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = GetGroupLights.sh; sourceTree = "<group>"; };
+		20C1C55A1B7CF5C2001FE2FB /* doStoreGroupLightsState.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = doStoreGroupLightsState.sh; sourceTree = "<group>"; };
+		20C1C55B1B7E0302001FE2FB /* doNotifyGroup.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = doNotifyGroup.sh; sourceTree = "<group>"; };
 		AAAA150730090325AA000006 /* abi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = abi.cpp; sourceTree = "<group>"; };
 		AAAA150730090325AA000007 /* Arduino.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arduino.h; sourceTree = "<group>"; };
 		AAAA150730090325AA000008 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary.h; sourceTree = "<group>"; };
@@ -491,10 +492,11 @@
 			isa = PBXGroup;
 			children = (
 				20B7EBC91B7C7D780050CD78 /* doStartYunHue.sh */,
-				20C1C55A1B7CF5C2001FE2FB /* GetGroupLights.sh */,
+				20C1C55A1B7CF5C2001FE2FB /* doStoreGroupLightsState.sh */,
 				20B7EBCB1B7C82300050CD78 /* hueUsername */,
 				20B7EBCC1B7CC4340050CD78 /* Yun preparations */,
 				20B7EBCD1B7CCBAB0050CD78 /* UploadScripts.sh */,
+				20C1C55B1B7E0302001FE2FB /* doNotifyGroup.sh */,
 			);
 			name = "Yun scripts";
 			sourceTree = "<group>";
