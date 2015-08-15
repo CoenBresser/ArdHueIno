@@ -23,5 +23,9 @@ public:
     // default Delay is 20ms if slower the steps in the fade effect will be visible
     //
     static void fadeForMillis(int totalTime, int stepSize, int led = 13, int delayTime = 20);
+    
+    // Set a PWM LED to a specific brightness
+    static void setBrightness(int brigthness, int led = 13);
+    
 };
 #endif /* defined(__BabyHue__LedControl__) */

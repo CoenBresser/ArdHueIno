@@ -74,7 +74,7 @@ void Hue_::restoreLightStates(void (*waitFunction)(void)) {
 
 /************************************** Manipulation *********************************/
 
-void Hue_::setLightStates(bool on, int brightness, int hue, int saturation, void (*waitFunction)(void)) {
+void Hue_::setLightStates(bool on, int brightness, long hue, int saturation, void (*waitFunction)(void)) {
     
     char msg[70];
     sprintf(msg, "Setting lights in group to on:%s, bri:%d, hue:%d, sat:%d", on ? "true":"false", brightness, hue, saturation);

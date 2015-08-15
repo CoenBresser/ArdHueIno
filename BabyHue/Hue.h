@@ -22,7 +22,7 @@ public:
     void storeLightStates(void (*waitFunction)(void) = NULL);
     void restoreLightStates(void (*waitFunction)(void) = NULL);
     
-    void setLightStates(bool on, int brightness, int hue, int saturation, void (*waitFunction)(void) = NULL);
+    void setLightStates(bool on, int brightness, long hue, int saturation, void (*waitFunction)(void) = NULL);
     void revealSelectedLights(void (*waitFunction)(void) = NULL);    
     
 };

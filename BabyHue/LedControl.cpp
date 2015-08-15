@@ -35,3 +35,7 @@ void LedControl::fadeForMillis(int totalTime, int stepSize, int led, int delayTi
     }
     analogWrite(led, 0);
 }
+
+void LedControl::setBrightness(int brigthness, int led) {
+    analogWrite(led, brigthness);
+}
